@@ -27,8 +27,14 @@
       "@/components": [
         "./src/app/(frontend)/components"
       ],
+      "@/components/*": [
+        "./src/app/(frontend)/components/*"
+      ],
       "@/lib": [
         "./src/app/(frontend)/lib"
+      ],
+      "@/lib/*": [
+        "./src/app/(frontend)/lib/*"
       ],
       "@/*": [
         "./src/*"

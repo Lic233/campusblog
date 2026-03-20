@@ -2,20 +2,24 @@
 
 ## 1. 文档目的
 
-本文档保留项目的主要架构设计，用于统一后续开发中的技术选型、系统分层、服务边界与核心数据组织方式。
+本文档描述校园博客系统的主要架构设计，用于统一后续开发中的技术选型、系统分层、服务边界与核心数据组织方式。
+
+启动模板将 **Next.js** 与 **Payload CMS** 置于**同一 Git 仓库根目录**，并采用 Payload 面向 **Cloudflare D1** 的集成方式：`next.config.ts` 经由 `withPayload` 包装，生产构建通过 **`@opennextjs/cloudflare`** 产出 Workers 可执行产物，绑定关系在根目录 **`wrangler.jsonc`** 中维护。对外站点与本地开发以 `pnpm dev` 等脚本启动，具体步骤见仓库 `README.md`。
+
+前台路由位于 **`src/app/(frontend)`**，统一引入 Tailwind 与（按需添加的）shadcn/ui 组件；**`src/app/(payload)`** 承载 Payload 管理界面与自动生成的 API 路由，使用 Payload 自带样式资源，不参与前台 Tailwind 的 `content` 扫描。
 
 项目技术栈如下：
 
 * 前端框架：Next.js（15.x）
-* React：18.x
-* UI 组件体系：shadcn/ui
-* 样式方案：Tailwind CSS（4.2）
-* 富文本编辑器：Tiptap（3.x）
-* 视觉增强组件：Aceternity UI
-* 内容管理：Payload CMS（3.x，与 Next.js 合并为同一项目）
-* 业务 ORM：Drizzle ORM（访问 D1 业务表）
-* JWT 库：`jose`（边缘兼容）
-* 部署平台：Cloudflare Pages + Workers
+* React：19.x
+* UI 组件体系：shadcn/ui（根目录 `components.json`；路径别名 `@/components`、`@/lib` 指向 `src/app/(frontend)` 下目录；组件通过 CLI 按需安装）
+* 样式方案：Tailwind CSS（3.x），经 PostCSS 接入；配置文件为根目录 `tailwind.config.ts` 与 `postcss.config.mjs`，全局样式入口为 `src/app/(frontend)/styles.css`
+* 富文本编辑器：Tiptap（3.x）（用于前台文章编辑，在写作功能落地时接入，存储约定见 §5.4）
+* 视觉增强组件：Aceternity UI（用于门户与展示型页面的动效与视觉强化）
+* 内容管理：Payload CMS（3.x）；数据库适配器为 **`@payloadcms/db-d1-sqlite`**，媒体为 **`@payloadcms/storage-r2`**
+* 业务 ORM：Drizzle ORM（访问 D1 中 `biz_` 前缀业务表，在互动与用户账号等模块落地时启用）
+* JWT 库：`jose`（用于前台注册用户的 JWT 签发与校验，在认证流程落地时启用）
+* 部署与运行时：**OpenNext Cloudflare** + Wrangler，目标环境为 **Cloudflare Workers**（静态资源与增量缓存等按模板绑定配置）
 
 本项目目标是构建一个面向校园场景的现代化博客平台，支持分层浏览、分层发布、内容上浮发现与后续业务扩展。
 
@@ -29,9 +33,9 @@
 
 * 使用 **Cloudflare D1**（SQLite 内核的边缘数据库）
 * 所有数据表通过表前缀做逻辑隔离：
-  * Payload CMS 内容表使用 `cms_` 前缀（由 Payload SQLite 适配器自动管理）
-  * 业务表使用 `biz_` 前缀（由 Drizzle ORM 管理，通过 D1 binding 访问）
-* 开发环境：Wrangler 自动在本地创建 SQLite 文件模拟 D1（存储于 `web/.wrangler/state/`）
+  * Payload CMS 内容表使用 `cms_` 前缀（由 **`@payloadcms/db-d1-sqlite`** 适配器配合 D1 管理）
+  * 业务表使用 `biz_` 前缀（规划由 Drizzle ORM 管理，通过 D1 binding 访问）
+* 开发环境：Wrangler 在本地以 SQLite 文件等方式模拟 D1，状态目录位于仓库根目录下的 **`.wrangler/state/`**（已纳入 `.gitignore`）
 
 ### 1.1.2 对象存储
 
@@ -40,7 +44,7 @@
 作用：
 
 * 存储文章封面、正文图片、用户头像等媒体资源
-* Payload CMS 通过 S3 适配器对接 R2（R2 完全兼容 S3 API）
+* Payload CMS 通过 **`@payloadcms/storage-r2`** 将媒体写入 R2，由 Wrangler 中的 `R2` 绑定注入运行时
 
 开发环境：Wrangler 本地 R2 模拟（文件落到 `.wrangler/state/`）
 
@@ -69,14 +73,14 @@
 
 ### 1.1.5 本地开发环境
 
-**本地开发通过 Wrangler CLI 统一管理，不依赖本机 Docker。**
+**日常开发不依赖本机 Docker**；Cloudflare 相关绑定由 Wrangler 与 Next.js 开发服务器协同提供（详见仓库 `README.md`）。
 
 ```bash
-# 启动带 CF 绑定的本地开发服务器
-npx wrangler pages dev
+# 安装依赖后启动 Next.js 开发服务器（模板默认脚本）
+pnpm dev
 ```
 
-Wrangler 自动在本地模拟所有 Cloudflare 服务：
+Wrangler 可在本地模拟或代理下列能力（具体绑定名称以 `wrangler.jsonc` 为准）：
 
 | 服务 | 本地方案 | 生产方案 |
 |------|---------|---------|
@@ -85,13 +89,13 @@ Wrangler 自动在本地模拟所有 Cloudflare 服务：
 | 对象存储 | Wrangler 本地 R2（磁盘文件） | Cloudflare R2 |
 | 邮件 | Resend 沙箱（控制台查看） | Resend 真实发送 |
 
-本地状态目录 `web/.wrangler/state/` 已加入 `.gitignore`，不提交仓库。
+本地 Wrangler 状态位于 **`.wrangler/state/`**，由 `.gitignore` 排除，不进入版本库。
 
 ---
 
 ## 2. 架构设计原则
 
-本项目采用**单服务架构**，所有功能集中在 Next.js + Payload CMS 合并项目中，部署于 Cloudflare Pages。
+本项目采用**单服务架构**，所有功能集中在 Next.js + Payload CMS 合并项目中；构建产物通过 **OpenNext Cloudflare** 发布到 **Cloudflare Workers**，配套 R2、D1 等绑定由 `wrangler.jsonc` 声明。
 
 核心原则如下：
 
@@ -243,7 +247,7 @@ jose 签发 JWT（{ userId, exp }，有效期 7 天）
 
 ### 4.1 前端 + 内容管理 + 业务后端（单一项目）
 
-本项目是**单一 Node.js 项目**，由 **Next.js + Payload CMS + Drizzle ORM** 组成，部署在 Cloudflare Pages。
+本项目是**单一 Node.js 项目**，由 **Next.js + Payload CMS** 构成核心运行时；**Drizzle ORM** 在业务表与互动逻辑接入后与之并列承担数据访问。整体经 OpenNext 部署到 Cloudflare Workers。
 
 其中：
 
@@ -276,14 +280,16 @@ Next.js 是系统统一入口，承担**前端渲染和全部后端逻辑**：
 * 通过 **Drizzle ORM** 直接读写业务数据表（D1 binding）
 * Server Actions 实现用户认证（注册、登录、登出）
 * Route Handlers 实现业务 API（评论、点赞、收藏等互动数据端点）
-* middleware.ts 实现 JWT 验证与路由保护
+* `src/middleware.ts`（或仓库根目录同等文件，按 Next.js 约定）实现 JWT 验证与路由保护；该文件在认证阶段落地时加入仓库
 
 ### 5.2 shadcn/ui
 
 shadcn/ui 用于建立现代化、可扩展的组件体系，主要承担：
 
 * 顶部导航、侧边栏、卡片、弹窗、表单、分页等公共组件
-* 前台内容展示与后台交互界面的统一风格
+* 前台内容展示区域的统一风格与交互模式
+
+组件源码放在 **`src/app/(frontend)/components`**（例如 `ui/` 子目录存放 CLI 生成的基础件），工具函数放在 **`src/app/(frontend)/lib`**（如 `cn` 辅助函数）。**Payload `/admin` 管理界面**沿用 Payload 自带 UI，不强制使用 shadcn。
 
 ### 5.3 Tailwind CSS
 
@@ -292,6 +298,8 @@ Tailwind CSS 负责：
 * 页面布局与样式实现
 * 响应式设计
 * 主题色、间距、圆角、阴影等设计令牌表达
+
+根目录 **`tailwind.config.ts`** 将 `content` 限定为 **`src/app/(frontend)`** 下源码，使工具类仅针对前台打包；主题扩展与 shadcn 所需的 `theme.extend` 可在后续随设计系统一并补充。
 
 ### 5.4 Tiptap
 
@@ -337,6 +345,49 @@ HTML 字符串 → DOMPurify 清洗（防 XSS）→ 注入页面
 **正文中的图片：**
 通过 Tiptap Image 扩展插入。用户粘贴/上传图片时，前端先调用 Payload Media API 上传至 R2，取回 URL 后写入 ProseMirror `image` 节点的 `src` 属性。
 
+#### 5.4.2 管理端与前台调用方式（实现约定）
+
+**管理端 `/admin`：用 Tiptap 接管某个 `json` 字段的编辑与列表摘要**
+
+正文类数据在集合中应使用 **`type: 'json'`**（存 ProseMirror JSON 对象），**不要**使用 Payload 默认的 **`richText`（Lexical）** 承载同一内容。在字段的 `admin` 上挂载统一导出：
+
+```typescript
+import type { CollectionConfig } from 'payload'
+import { tiptapJsonAdminComponents } from '../fields/tiptapJsonAdmin'
+
+// 示例：任意集合中的字段片段
+{
+  name: 'body', // 或 content、description 等，按模型命名
+  type: 'json',
+  label: 'Body',
+  admin: {
+    description: 'Edited with Tiptap; stored as ProseMirror JSON.',
+    components: tiptapJsonAdminComponents,
+  },
+}
+```
+
+* **`tiptapJsonAdminComponents`** 定义于 **`src/fields/tiptapJsonAdmin.ts`**，内部指向：
+  * **`TiptapPayloadJsonField`**：编辑表单中的 Tiptap 编辑器；只读场景下使用 **`TiptapReadOnly`**。
+  * **`TiptapPayloadJsonCell`**：列表视图中对 JSON 正文的纯文本摘要（避免每行挂载完整编辑器）。
+* 组件实现位于 **`src/app/(frontend)/components/editor/`**，路径需与 Payload **`admin.importMap.baseDir`（`src/`）** 及 **`components.json`** 中的约定一致。
+* 若新增或重命名上述 Admin 自定义组件路径，需执行 **`pnpm exec cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap`** 更新 **`src/app/(payload)/admin/importMap.js`**。
+* 根目录 **`next.config.ts`** 中为 Webpack 配置了 **`resolve.alias.app` → `src/app`**，以便构建期解析 importMap 中的 `app/(frontend)/...` 模块路径。
+
+**扩展列表（编辑 / 只读 / 将来服务端 HTML 需一致）**
+
+* 公共扩展数组在 **`src/app/(frontend)/lib/tiptap-extensions.ts`**（当前为 **StarterKit**）。增加 **Image、Link** 等扩展时，只改此文件，并保证 Admin 与前台使用同一套扩展，避免 JSON 与 schema 不一致。
+
+**前台站点（`src/app/(frontend)`）**
+
+* **`TiptapEditor`**（Client）：可编辑；通过 **`content`**、**`onChange`** 与表单或 Server Action 对接；内部已设置 **`immediatelyRender: false`** 以适配 Next.js App Router。
+* **`TiptapReadOnly`**（Client）：根据已存储的 JSON 做只读渲染，适合边缘部署下的详情页。
+* 全局样式与 ProseMirror 基础排版见 **`src/app/(frontend)/styles.css`** 中 **`.tiptap-editor`** 相关规则。
+
+**与全局 `editor` / Lexical 的关系**
+
+* 本仓库未在 **`payload.config.ts`** 中配置 **`editor: lexicalEditor()`**。若日后为其它字段单独启用 **`richText`**，需自行配置 Lexical **`editor`**；**Tiptap 正文字段仍应保持 `type: 'json'` + 上述 `components`**，二者勿混用同一存储格式。
+
 ### 5.5 Payload CMS
 
 Payload CMS **与 Next.js 合并为同一项目**，负责：
@@ -347,11 +398,11 @@ Payload CMS **与 Next.js 合并为同一项目**，负责：
 * 通过 **Local API** 供 Next.js 服务端直接调用，是内容读写的主要路径
 * 文章与层级归属关系维护
 
-**合并方式**：使用 Payload CMS 官方提供的 `withPayload` Next.js 集成方案（`create-payload-app --template with-nextjs`），Payload 配置文件（`payload.config.ts`）与 `next.config.ts` 共存于项目根目录。
+**合并方式**：使用 Payload CMS 官方提供的 **`withPayload`**（`@payloadcms/next`）包装 Next 配置；启动模板对应 **Cloudflare D1** 场景，应用源码位于 **`src/`** 下，其中 **`src/payload.config.ts`** 为 Payload 配置入口，**`src/collections/`** 等目录承载集合定义。
 
-**数据库适配器**：使用 `@payloadcms/db-sqlite`，通过 D1 binding 访问 Cloudflare D1。
+**数据库适配器**：**`@payloadcms/db-d1-sqlite`**，通过 Wrangler 注入的 D1 绑定访问 Cloudflare D1。
 
-**存储适配器**：使用 `@payloadcms/storage-s3`，配置 R2 的 S3 兼容端点。
+**存储适配器**：**`@payloadcms/storage-r2`**，媒体文件写入与 R2 绑定 `R2` 对应。
 
 ### 5.6 Drizzle ORM
 
@@ -360,15 +411,14 @@ Drizzle ORM 负责业务表（`biz_` 前缀）的数据访问：
 * 完全类型安全的 SQL 查询构建器，原生支持 D1（SQLite 方言）
 * 在边缘运行时（Cloudflare Workers）中零依赖原生模块
 * 通过 Cloudflare D1 binding 执行查询
-* Schema 定义文件位于 `web/drizzle/`
-* 迁移脚本通过 Drizzle Kit 生成，存放于 `web/drizzle/migrations/`
+* Schema 与迁移文件规划放在仓库根目录下的 **`drizzle/`**（如 `schema.ts`、`migrations/`，具体以接入 Drizzle Kit 时的目录为准）
 
 ### 5.7 jose（JWT 库）
 
 `jose` 是一个 Web Standards 兼容的 JWT 库，在 Node.js 和 Cloudflare Workers 边缘运行时均可使用：
 
 * 用于注册/登录时签发 JWT
-* 用于 middleware.ts 中验证 JWT
+* 用于 `src/middleware.ts`（或 Next.js 约定的根级 `middleware.ts`）中验证 JWT
 * 签发算法：`HS256`，密钥从 `JWT_SECRET` 环境变量读取
 
 ### 5.8 Aceternity UI
@@ -493,110 +543,121 @@ Aceternity UI 用于在前端进行视觉增强，主要承担：
 
 ## 9. 推荐项目结构
 
-本项目采用**单一 Git 仓库（Monorepo）**，整个系统只有一个子项目 `web/`。
+本项目采用**单一 Git 仓库、单包应用**：Next.js、Payload 与（后续接入的）业务代码共享仓库根目录下的 `package.json`，源码主目录为 **`src/`**。对外门户、认证与用户区等页面按 Next.js 路由组逐步展开，优先落在 **`src/app/(frontend)`** 及其子目录中。
 
 ### 9.0 仓库根目录结构
 
 ```text
 CampusBlog/                        ← Git 仓库根目录
-  web/                             ← 唯一子项目：Next.js + Payload CMS + 所有业务逻辑
-  doc/                             ← 项目文档
+  doc/                             ← 项目文档（本文件所在目录）
+  src/                             ← 应用源码（Next.js App Router + Payload）
+  public/                          ← 静态资源
+  tests/                           ← 测试（如 Playwright、Vitest）
+  components.json                  ← shadcn/ui 配置
+  tailwind.config.ts
+  postcss.config.mjs
+  next.config.ts
+  wrangler.jsonc                   ← Cloudflare Workers / D1 / R2 等绑定
+  package.json
+  .env / .env.example
   .gitignore
   README.md
 ```
 
-### 9.1 前端 + CMS + 业务后端合并项目（web）
+### 9.1 前端 + CMS + 业务后端（`src/`）
+
+启动模板当前已包含 `(frontend)` 与 `(payload)` 路由组；下列树状结构描述校园博客全量落地时的推荐布局，其中标注为规划的目录与文件可在对应功能开发阶段按需创建。
 
 ```text
-web/
+src/
   app/
-    (public)/                      ← 无需登录的公开页面
-      page.tsx                     ← 首页
-      school/[slug]/page.tsx
-      campus/[slug]/page.tsx
-      college/[slug]/page.tsx
-      post/[slug]/page.tsx
-      search/page.tsx
-    (auth)/                        ← 登录注册页（无 Layout Header）
-      login/page.tsx
-      register/page.tsx
-    (user)/                        ← 需要登录的用户页面
-      user/[id]/page.tsx
-      user/me/page.tsx
-      editor/page.tsx
-    api/
-      auth/
-        login/route.ts             ← POST 登录（Route Handler）
-        register/route.ts          ← POST 注册
-        send-code/route.ts         ← POST 发送验证码
-        logout/route.ts            ← POST 登出
-      comments/route.ts            ← GET/POST 评论
-      likes/route.ts               ← POST/DELETE 点赞
-      favorites/route.ts           ← POST/DELETE 收藏
-      follows/route.ts             ← POST/DELETE 关注
-    (payload)/                     ← Payload CMS 路由（自动生成，勿手动修改）
+    (frontend)/                    ← 对外站点：Tailwind + shadcn 作用域
+      layout.tsx
+      page.tsx                     ← 首页（可随门户改版替换）
+      styles.css                   ← Tailwind 入口与全局样式
+      components/                  ← 前台组件（shadcn `ui/`、布局与业务块）
+        ui/                        ← CLI 生成的基础组件
+        layout/                    ← Header、Footer、Sidebar 等
+        article/                   ← ArticleCard、CommentSection 等
+        hierarchy/                 ← 层级导航、面包屑等
+        editor/                    ← Tiptap 编辑器封装（写作功能阶段）
+      lib/                         ← 工具函数（如 `utils.ts` 中的 `cn`）
+      (public)/                    ← 规划：无需登录的门户子路由（可选路由组）
+        school/[slug]/page.tsx
+        campus/[slug]/page.tsx
+        college/[slug]/page.tsx
+        post/[slug]/page.tsx
+        search/page.tsx
+      (auth)/                      ← 规划：登录、注册
+      (user)/                      ← 规划：用户中心、写作台
+    (payload)/                     ← Payload 管理端与 API（模板生成，勿手改结构）
       admin/[[...segments]]/
       api/[...slug]/
-  collections/                     ← Payload CMS Collection 定义
-    School.ts
-    Campus.ts
-    College.ts
-    Post.ts
-    Tag.ts
-    Media.ts
-    UserProfile.ts
-  drizzle/                         ← Drizzle ORM（业务表）
-    schema.ts                      ← biz_ 表的 Drizzle schema 定义
-    migrations/                    ← Drizzle Kit 生成的迁移 SQL 文件
-  globals/                         ← Payload CMS Global 定义
-  hooks/                           ← Payload CMS Hooks
-  access/                          ← Payload CMS Access Control 函数
-  components/
-    ui/                            ← shadcn/ui 基础组件
-    layout/                        ← 全局布局：Header、Footer、Sidebar
-    article/                       ← 文章相关：ArticleCard、CommentSection 等
-    hierarchy/                     ← 层级导航：HierarchyNav、Breadcrumb 等
-    editor/                        ← Tiptap 编辑器封装：TiptapEditor
-  lib/
-    api/
-      cms.ts                       ← Payload Local API 封装（仅服务端调用）
-    auth/
-      getUser.ts                   ← 从 middleware 注入的 header 或 Cookie 解析 JWT，返回 `userId`
-    db/
-      index.ts                     ← Drizzle client 初始化（通过 D1 binding）
-  middleware.ts                    ← JWT 验证、路由保护
-  types/                           ← 全局 TypeScript 类型定义
-  payload.config.ts                ← Payload CMS 配置入口
-  next.config.ts                   ← Next.js 配置（含 withPayload 包装）
-  wrangler.toml                    ← Cloudflare 绑定配置（D1、R2、KV 名称）
-  package.json
-  .env.example                     ← 环境变量模板（提交 Git）
-  .env.local                       ← 本地真实环境变量（在 .gitignore 中）
+    api/                           ← 规划：业务 Route Handlers
+      auth/
+        login/route.ts
+        register/route.ts
+        send-code/route.ts
+        logout/route.ts
+      comments/route.ts
+      likes/route.ts
+      favorites/route.ts
+      follows/route.ts
+  collections/                     ← Payload Collections（当前含 Users、Media 等）
+  migrations/                      ← Payload 数据库迁移
+  payload.config.ts                ← Payload 配置入口
+  payload-types.ts                 ← 由 `generate:types` 生成
+  middleware.ts                    ← 规划：JWT 与路由保护（认证阶段添加）
+  hooks/                           ← Payload Hooks（按需）
+  access/                          ← Payload Access 函数（按需）
+  globals/                         ← Payload Globals（按需）
 ```
 
-### 9.2 `wrangler.toml` 绑定配置示例
+**Drizzle 与共享库（规划路径）：**
 
-```toml
-name = "campusblog"
-compatibility_date = "2025-01-01"
-compatibility_flags = ["nodejs_compat"]
-
-[[d1_databases]]
-binding = "DB"
-database_name = "campusblog"
-database_id = "your-d1-database-id"
-
-[[kv_namespaces]]
-binding = "KV"
-id = "your-kv-namespace-id"
-
-[[r2_buckets]]
-binding = "R2"
-bucket_name = "campusblog"
-
-[vars]
-NEXT_PUBLIC_APP_URL = "http://localhost:3000"
+```text
+drizzle/                           ← 仓库根目录：biz_ 业务表 schema 与 Drizzle Kit 迁移
+  schema.ts
+  migrations/
+src/lib/                           ← 规划：服务端共享模块（若创建）
+  api/cms.ts                       ← Payload Local API 封装
+  auth/getUser.ts                  ← 从 Cookie / header 解析前台用户
+  db/index.ts                      ← Drizzle 客户端（D1 binding）
 ```
+
+TypeScript 路径别名在根目录 **`tsconfig.json`** 中维护：除 `@/*` → `./src/*` 与 `@payload-config` 外，**`@/components`**、**`@/lib`** 已指向前台目录，便于 shadcn CLI 与业务代码一致引用。
+
+### 9.2 Cloudflare 绑定配置（`wrangler.jsonc`）
+
+绑定声明位于仓库根目录的 **`wrangler.jsonc`**（JSON with Comments），与 OpenNext 构建产物路径（如 `.open-next/worker.js`、`.open-next/assets`）配套使用。下列片段展示**典型结构**；`database_id`、存储桶名等需替换为你在 Cloudflare 控制台中的实际资源标识。
+
+```jsonc
+{
+  "name": "campusblog",
+  "compatibility_date": "2025-08-15",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "main": ".open-next/worker.js",
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "D1",
+      "database_name": "campusblog",
+      "database_id": "your-d1-database-id"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2",
+      "bucket_name": "campusblog"
+    }
+  ]
+}
+```
+
+若后续启用 Workers KV（验证码、限流等），在同一文件中增加 `kv_namespaces` 数组即可；具体键名与绑定名须与运行时读取环境变量的代码一致。
 
 ---
 
@@ -605,7 +666,7 @@ NEXT_PUBLIC_APP_URL = "http://localhost:3000"
 本项目采用 **Next.js + Payload CMS（合并部署）+ Cloudflare 全栈基础设施** 的单服务架构，具备以下特征：
 
 * **单一部署单元**：页面、业务 Route Handlers / Server Actions 与 CMS 同应用交付；对外 API 与前端同源，无单独后端部署项。
-* **边缘数据面**：D1、R2、Workers KV 为 Cloudflare 托管服务，与 Pages / Workers 部署模型一致。
+* **边缘数据面**：D1、R2、Workers KV 为 Cloudflare 托管服务，与 Workers 及 OpenNext 资源绑定模型一致。
 * **Local API**：Next.js 与 Payload 同进程，内容读写通过 Local API，无额外 HTTP 环回。
 * **类型安全**：Drizzle ORM + TypeScript 覆盖 `biz_` 业务表访问。
 * **本地开发**：Wrangler 模拟 D1、KV、R2 绑定，与生产配置对齐。
