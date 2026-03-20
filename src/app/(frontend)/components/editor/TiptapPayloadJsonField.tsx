@@ -8,8 +8,8 @@ import { TiptapEditor } from './TiptapEditor'
 import { TiptapReadOnly } from './TiptapReadOnly'
 
 /**
- * Payload Admin 中 `type: 'json'` 字段的自定义输入：用 Tiptap 替代默认 JSON 文本框。
- * 与全局 `richText` / Lexical 无关；正文类字段请使用本组件 + `json` 类型。
+ * Custom field component for `type: 'json'` fields in the Payload admin.
+ * Replaces the default JSON textarea with Tiptap. Not related to Lexical / richText.
  */
 export const TiptapPayloadJsonField: JSONFieldClientComponent = (props) => {
   const { path, readOnly, field } = props

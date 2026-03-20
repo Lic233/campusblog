@@ -6,7 +6,7 @@ import type { JSONFieldClient } from 'payload'
 import { tiptapJsonToPlainText } from '@/lib/tiptapSerialize'
 
 /**
- * 列表视图中的 JSON 正文预览：纯文本摘要，避免每行挂载完整 Tiptap。
+ * List-view cell for JSON body fields: shows a plain-text excerpt instead of raw JSON.
  */
 export function TiptapPayloadJsonCell(props: DefaultCellComponentProps<JSONFieldClient>) {
   const raw = props.cellData
