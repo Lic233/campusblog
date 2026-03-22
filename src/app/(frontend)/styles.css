@@ -119,6 +119,23 @@ svg {
     h1 {
       text-align: center;
     }
+
+    .languageSwitcher {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      line-height: 20px;
+
+      .languageSwitcherLabel {
+        font-weight: 500;
+      }
+
+      .languageSwitcherSelect {
+        min-width: 130px;
+      }
+    }
   }
 
   .links {

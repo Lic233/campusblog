@@ -1,0 +1,13 @@
+{
+  "home": {
+    "logoAlt": "Payload Logo",
+    "welcome": "Welcome to your new project.",
+    "welcomeBack": "Welcome back, {{email}}",
+    "languageLabel": "Language",
+    "languageZh": "Chinese",
+    "languageEn": "English",
+    "goAdmin": "Go to admin panel",
+    "documentation": "Documentation",
+    "editHint": "Update this page by editing"
+  }
+}

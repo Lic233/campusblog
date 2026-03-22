@@ -1,0 +1,13 @@
+{
+  "home": {
+    "logoAlt": "Payload 徽标",
+    "welcome": "欢迎来到你的新项目。",
+    "welcomeBack": "欢迎回来，{{email}}",
+    "languageLabel": "语言",
+    "languageZh": "中文",
+    "languageEn": "英文",
+    "goAdmin": "进入管理后台",
+    "documentation": "文档",
+    "editHint": "你可以编辑以下文件来更新本页"
+  }
+}
