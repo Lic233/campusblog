@@ -15,6 +15,11 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS",
   },
+  "vars": {
+    // Non-sensitive runtime vars. For sensitive values (e.g. PAYLOAD_SECRET),
+    // use `wrangler secret put` instead of committing to this file.
+    "GITHUB_URL": "https://github.com/ZhuHaoming2005/campusblog",
+  },
   "d1_databases": [
     {
       "binding": "D1",
@@ -53,6 +58,9 @@
   // "env": {
   //   "staging": {
   //     "name": "my-app-staging",
+  //     "vars": {
+  //       "GITHUB_URL": "https://github.com/<your-org>/<your-repo>"
+  //     },
   //     "d1_databases": [
   //       {
   //         "binding": "D1",
