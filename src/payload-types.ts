@@ -63,17 +63,17 @@ export type SupportedTimezones =
 
 export interface Config {
   auth: {
-    admins: AdminAuthOperations;
+    users: UserAuthOperations;
   };
   blocks: {};
   collections: {
-    admins: Admin;
+    users: User;
     media: Media;
     schools: School;
     'school-sub-channels': SchoolSubChannel;
     tags: Tag;
-    'user-profiles': UserProfile;
     posts: Post;
+    comments: Comment;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -81,13 +81,13 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    admins: AdminsSelect<false> | AdminsSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     schools: SchoolsSelect<false> | SchoolsSelect<true>;
     'school-sub-channels': SchoolSubChannelsSelect<false> | SchoolSubChannelsSelect<true>;
     tags: TagsSelect<false> | TagsSelect<true>;
-    'user-profiles': UserProfilesSelect<false> | UserProfilesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    comments: CommentsSelect<false> | CommentsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -103,13 +103,13 @@ export interface Config {
   widgets: {
     collections: CollectionsWidget;
   };
-  user: Admin;
+  user: User;
   jobs: {
     tasks: unknown;
     workflows: unknown;
   };
 }
-export interface AdminAuthOperations {
+export interface UserAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -129,14 +129,38 @@ export interface AdminAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "admins".
+ * via the `definition` "users".
  */
-export interface Admin {
+export interface User {
   id: number;
+  /**
+   * Public name shown in article bylines and profile cards.
+   */
+  displayName: string;
+  /**
+   * Short profile biography shown on user-facing profile sections.
+   */
+  bio?: string | null;
+  /**
+   * Profile image displayed for the user across the site.
+   */
+  avatar?: (number | null) | Media;
+  /**
+   * Controls whether this account can access author features.
+   */
+  isActive?: boolean | null;
   /**
    * Admin role controls privileged operations in Payload collections/endpoints. Keep at least one admin role account.
    */
-  roles: ('admin' | 'editor')[];
+  roles: ('admin' | 'editor' | 'user')[];
+  /**
+   * Publishing quota in bytes. Default is 100MB.
+   */
+  quotaBytes?: number | null;
+  /**
+   * Current total published bytes (text + media).
+   */
+  usedBytes?: number | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -154,7 +178,7 @@ export interface Admin {
       }[]
     | null;
   password?: string | null;
-  collection: 'admins';
+  collection: 'users';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -265,35 +289,6 @@ export interface Tag {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "user-profiles".
- */
-export interface UserProfile {
-  id: number;
-  /**
-   * Foreign key reference to biz_users.id from the business user table.
-   */
-  bizUserID: string;
-  /**
-   * Public name shown in article bylines and profile cards.
-   */
-  displayName: string;
-  /**
-   * Short profile biography shown on user-facing profile sections.
-   */
-  bio?: string | null;
-  /**
-   * Profile image displayed for the user across the site.
-   */
-  avatar?: (number | null) | Media;
-  /**
-   * Controls whether this profile can be shown publicly.
-   */
-  isActive?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts".
  */
 export interface Post {
@@ -320,9 +315,9 @@ export interface Post {
    */
   subChannel?: (number | null) | SchoolSubChannel;
   /**
-   * Public profile shown as the article author.
+   * Author account from the Payload users collection.
    */
-  authorProfile?: (number | null) | UserProfile;
+  author: number | User;
   /**
    * Topic labels used for filtering and recommendations.
    */
@@ -356,6 +351,35 @@ export interface Post {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "comments".
+ */
+export interface Comment {
+  id: number;
+  /**
+   * Post that this comment belongs to.
+   */
+  post: number | Post;
+  /**
+   * Author account from the Payload users collection.
+   */
+  author: number | User;
+  /**
+   * Optional parent comment for threaded replies.
+   */
+  parent?: (number | null) | Comment;
+  /**
+   * Moderation status. Hidden comments are excluded from public view.
+   */
+  status: 'published' | 'hidden';
+  /**
+   * Plain-text comment body.
+   */
+  content: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -379,8 +403,8 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'admins';
-        value: number | Admin;
+        relationTo: 'users';
+        value: number | User;
       } | null)
     | ({
         relationTo: 'media';
@@ -399,17 +423,17 @@ export interface PayloadLockedDocument {
         value: number | Tag;
       } | null)
     | ({
-        relationTo: 'user-profiles';
-        value: number | UserProfile;
-      } | null)
-    | ({
         relationTo: 'posts';
         value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'comments';
+        value: number | Comment;
       } | null);
   globalSlug?: string | null;
   user: {
-    relationTo: 'admins';
-    value: number | Admin;
+    relationTo: 'users';
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -421,8 +445,8 @@ export interface PayloadLockedDocument {
 export interface PayloadPreference {
   id: number;
   user: {
-    relationTo: 'admins';
-    value: number | Admin;
+    relationTo: 'users';
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -450,10 +474,16 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "admins_select".
+ * via the `definition` "users_select".
  */
-export interface AdminsSelect<T extends boolean = true> {
+export interface UsersSelect<T extends boolean = true> {
+  displayName?: T;
+  bio?: T;
+  avatar?: T;
+  isActive?: T;
   roles?: T;
+  quotaBytes?: T;
+  usedBytes?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -531,19 +561,6 @@ export interface TagsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "user-profiles_select".
- */
-export interface UserProfilesSelect<T extends boolean = true> {
-  bizUserID?: T;
-  displayName?: T;
-  bio?: T;
-  avatar?: T;
-  isActive?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
@@ -553,12 +570,25 @@ export interface PostsSelect<T extends boolean = true> {
   status?: T;
   school?: T;
   subChannel?: T;
-  authorProfile?: T;
+  author?: T;
   tags?: T;
   coverImage?: T;
   excerpt?: T;
   content?: T;
   publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "comments_select".
+ */
+export interface CommentsSelect<T extends boolean = true> {
+  post?: T;
+  author?: T;
+  parent?: T;
+  status?: T;
+  content?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -1,8 +1,9 @@
 import type { CollectionConfig } from 'payload'
 
-import { adminOnly, adminOrPublished } from '@/access/admin'
+import { adminOrAuthor, adminOrPublishedOrAuthor, authenticated } from '@/access/admin'
 import { buildSlugField } from '@/fields/slug'
 import { tiptapJsonAdminComponents } from '@/fields/tiptapJsonAdmin'
+import { setCurrentAuthor } from '@/hooks/setCurrentAuthor'
 import { setPublishedAt } from '@/hooks/setPublishedAt'
 import { validatePostChannelRelation } from '@/hooks/validatePostChannelRelation'
 
@@ -21,13 +22,13 @@ export const Posts: CollectionConfig = {
     useAsTitle: 'title',
   },
   access: {
-    read: adminOrPublished,
-    create: adminOnly,
-    update: adminOnly,
-    delete: adminOnly,
+    read: adminOrPublishedOrAuthor,
+    create: authenticated,
+    update: adminOrAuthor,
+    delete: adminOrAuthor,
   },
   hooks: {
-    beforeValidate: [validatePostChannelRelation],
+    beforeValidate: [setCurrentAuthor, validatePostChannelRelation],
     beforeChange: [setPublishedAt],
   },
   fields: [
@@ -114,13 +115,15 @@ export const Posts: CollectionConfig = {
       },
     },
     {
-      name: 'authorProfile',
+      name: 'author',
       type: 'relationship',
-      relationTo: 'user-profiles',
+      relationTo: 'users',
+      required: true,
       index: true,
       admin: {
-        description: 'Public profile shown as the article author.',
+        description: 'Author account from the Payload users collection.',
         position: 'sidebar',
+        readOnly: true,
       },
     },
     {

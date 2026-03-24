@@ -18,7 +18,7 @@ type TagDoc = {
   name?: string
 }
 
-type UserProfileDoc = {
+type UserDoc = {
   displayName?: string
   avatar?: MediaDoc | string | number | null
 }
@@ -74,14 +74,14 @@ export default async function SchoolPage({
                   : null
                 : null
 
-            const authorProfile =
-              post.authorProfile && typeof post.authorProfile === 'object'
-                ? (post.authorProfile as UserProfileDoc)
+            const author =
+              post.author && typeof post.author === 'object'
+                ? (post.author as UserDoc)
                 : null
 
             const authorAvatar =
-              authorProfile?.avatar && typeof authorProfile.avatar === 'object'
-                ? (authorProfile.avatar as MediaDoc).url
+              author?.avatar && typeof author.avatar === 'object'
+                ? (author.avatar as MediaDoc).url
                 : null
 
             return (
@@ -93,7 +93,7 @@ export default async function SchoolPage({
                 contentText={extractTextFromTiptapJson(post.content)}
                 coverImageUrl={coverImage?.url}
                 coverImageAlt={coverImage?.alt}
-                authorName={authorProfile?.displayName}
+                authorName={author?.displayName}
                 authorAvatarUrl={authorAvatar}
                 tagLabel={firstTag}
                 aspectClass={getAspectClass(index)}

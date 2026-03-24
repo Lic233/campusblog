@@ -45,28 +45,26 @@
 
 ### 3.1 KV 使用策略
 
-- 注册验证码、发送冷却、限流计数、热点计数均直接写入 `KV`。
-- **不实现验证码 D1 降级表，不实现 KV 失效回退路径**。
+- 认证限流、发送冷却、热点计数均直接写入 `KV`。
+- **不实现 KV 的 D1 降级表，不实现 KV 失效回退路径**。
 - 若 KV 不可用，接口返回错误并提示重试，保障一致性与实现简洁。
 
 ---
 
 ## 4. 身份体系与权限边界
 
-### 4.1 前台用户（biz 用户）
+### 4.1 统一用户体系（Payload Users）
 
-- 用户存于 D1 `biz_users`
-- 登录态使用 JWT（httpOnly Cookie）
-- 可发布文章、评论、点赞、收藏、关注、订阅频道
+- 前台用户与管理员统一存于 Payload `users` 集合
+- 登录/注册/会话统一走 Payload Auth 体系（含 JWT / Cookie）
+- 通过 `roles` 字段区分权限：`admin`、`editor`、`user`
+- 用户可发布文章、发表评论、点赞、收藏、关注、订阅频道
 
-### 4.2 管理员（Payload 用户）
+### 4.2 管理权限（基于角色）
 
-- 管理员仅通过 Payload Users 登录 `/admin`
-- `biz_users` 不存放管理员角色
-- 管理员可在后台：
-  - 管理学校与子频道
-  - Review 文章（`published` / `hidden`）
-  - 调整用户上传配额（单用户与全量）
+- 管理员与编辑通过 `/admin` 进行内容运营
+- 文章与评论均支持 `published` / `hidden` 管理
+- 配额管理（单用户与全量）由管理员角色执行
 
 ---
 
@@ -147,14 +145,14 @@
 
 ### 8.2 Payload CMS
 
-- 学校、子频道、文章、标签、媒体等内容管理
+- 学校、子频道、文章、评论、标签、媒体、用户等内容管理
 - 管理后台 `/admin`
 - 频道管理、内容 Review、配额管理入口
 
 ### 8.3 Drizzle ORM
 
 - `biz_` 表类型安全访问
-- 订阅关系、互动关系、配额统计落库
+- 订阅关系、互动关系（点赞/收藏/关注）等业务数据落库
 
 ### 8.4 R2 / KV / D1
 
@@ -171,15 +169,14 @@
 - School
 - SchoolSubChannel
 - Post
+- Comment
 - Tag
 - Media
-- UserProfile
+- User
 - PlatformSettings（可选，管理端策略项）
 
 ### 9.2 Business（`biz_`）
 
-- User
-- Comment
 - LikeRecord
 - FavoriteRecord
 - FollowRecord
@@ -194,11 +191,11 @@
 | 调用方 | 被调用方 | 方式 | 场景 |
 |--------|----------|------|------|
 | Next.js Server Component | Payload | Local API | 学校/子频道/文章读取 |
-| Next.js Server Action | Payload | Local API | 文章发布、频道列表 |
+| Next.js Server Action | Payload | Local API | 文章发布、频道列表、评论写入 |
 | Next.js Server Action | Drizzle | 直接调用 | 订阅写入、配额校验、互动写入 |
-| Next.js Route Handler | Drizzle | 直接调用 | 评论、点赞、收藏、关注 |
-| Next.js Server Action | KV | Cloudflare binding | 验证码、冷却、限流 |
-| Next.js Server Action | Resend | HTTP API | 发验证码邮件 |
+| Next.js Route Handler | Drizzle | 直接调用 | 点赞、收藏、关注 |
+| Next.js Server Action | KV | Cloudflare binding | 冷却、限流、热点缓存 |
+| Next.js Server Action | Resend | HTTP API | 通知邮件（可选） |
 | 管理员浏览器 | Payload Admin | HTTP | 频道管理、配额调整、内容 Review |
 
 ---

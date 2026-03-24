@@ -12,9 +12,9 @@ import { r2Storage } from '@payloadcms/storage-r2'
 import { Posts } from './collections/Posts'
 import { SchoolSubChannels } from './collections/SchoolSubChannels'
 import { Schools } from './collections/Schools'
-import { Admins } from './collections/Admins'
+import { Comments } from './collections/Comments'
 import { Tags } from './collections/Tags'
-import { UserProfiles } from './collections/UserProfiles'
+import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 
 const filename = fileURLToPath(import.meta.url)
@@ -51,12 +51,12 @@ const cloudflare =
 
 export default buildConfig({
   admin: {
-    user: Admins.slug,
+    user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Admins, Media, Schools, SchoolSubChannels, Tags, UserProfiles, Posts],
+  collections: [Users, Media, Schools, SchoolSubChannels, Tags, Posts, Comments],
   i18n: {
     fallbackLanguage: 'zh',
     supportedLanguages: {

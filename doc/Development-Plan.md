@@ -56,7 +56,7 @@
 - 确认 `/admin` 可访问
 
 3. KV 策略定版
-- 注册验证码、发送冷却、限流全走 KV
+- 认证限流、发送冷却、热点缓存全走 KV
 - **不实现 D1 降级方案**
 
 4. 目录约定
@@ -88,7 +88,7 @@
 - `School`（学校）
 - `SchoolSubChannel`（学校子频道，归属 School）
 - `Post`（schoolId 必填，subChannelId 可选）
-- `Tag`、`Media`、`UserProfile`
+- `Tag`、`Media`、`User`（统一认证主体）
 
 2. 后台管理能力
 - 管理员在 `/admin` 可新增/编辑/启用/排序学校与子频道
@@ -144,14 +144,14 @@
 **主要任务**：
 
 1. 认证接口
-- `POST /api/auth/send-code`（KV 写验证码）
-- `POST /api/auth/register`（KV 验证 + 建号）
-- `POST /api/auth/login`
-- `POST /api/auth/logout`
+- `POST /api/users`（注册）
+- `POST /api/users/login`
+- `POST /api/users/logout`
+- `GET /api/users/me`
 
 2. 登录态
-- JWT 存储为 httpOnly Cookie
-- `src/middleware.ts` 注入 `x-user-id`
+- 统一使用 Payload Auth（JWT / Cookie）
+- 前台与管理员共享同一套 Payload 用户会话
 
 3. 发布与配额
 - 默认配额：`104857600` bytes
@@ -164,7 +164,7 @@
 
 **阶段验收标准**：
 
-- [ ] 注册验证码流程全链路可用（仅 KV）
+- [ ] Payload 用户注册/登录/登出全链路可用
 - [ ] 用户可登录并发布文章
 - [ ] 超过 100MB 时发布被拒绝
 - [ ] 硬删除文章后用户已用配额立即下降
@@ -179,7 +179,7 @@
 **主要任务**：
 
 1. 互动功能
-- 评论、点赞、收藏、关注
+- 评论（纳入 Payload `comments` 集合，支持 `hidden`）、点赞、收藏、关注
 
 2. 订阅功能
 - 学校订阅：`POST/DELETE /api/subscriptions/schools`
@@ -192,7 +192,8 @@
 
 **阶段验收标准**：
 
-- [ ] 互动功能状态可持久化
+- [ ] 评论、点赞、收藏、关注状态可持久化
+- [ ] 评论可由管理员在后台切换 `published` / `hidden`
 - [ ] 用户可订阅/取消订阅学校和子频道
 - [ ] 取消学校订阅可级联清理该校子频道订阅
 
@@ -243,7 +244,7 @@
 
 1. KV 直接使用，不做验证码 D1 降级。
 2. 发布配额默认 100MB，按字节严格校验（文字+图片）。
-3. 管理员体系仅使用 Payload Users，与 `biz_users` 分离。
+3. 用户与管理员统一使用 Payload Users，不再维护 `biz_users` 独立认证体系。
 4. 项目开发期即遵循 i18n 规范：至少 `zh-CN` + `en-US`，新功能必须双语同步交付。
 
 ---

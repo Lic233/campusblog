@@ -47,6 +47,11 @@ export async function POST(request: Request) {
     }
 
     const payload = await getPayload({ config })
+    const { user } = await payload.auth({ headers: request.headers })
+
+    if (!user) {
+      return Response.json({ error: 'Authentication is required' }, { status: 401 })
+    }
 
     const slug = slugify(title) + '-' + Date.now().toString(36)
 
@@ -75,6 +80,8 @@ export async function POST(request: Request) {
 
     const post = await payload.create({
       collection: 'posts',
+      overrideAccess: false,
+      user,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data: data as any,
     })
