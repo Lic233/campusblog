@@ -1,20 +1,28 @@
 import React from 'react'
 import { headers as getHeaders } from 'next/headers.js'
 import { cookies as getCookies } from 'next/headers.js'
-import { IconBrandGithub } from '@tabler/icons-react'
 
-import SidebarNav from '@/components/layout/SidebarNav'
-import LanguageSwitcher from '@/components/layout/LanguageSwitcher'
-import HideOnEditor from '@/components/layout/HideOnEditor'
+import FrontendChrome from '@/components/layout/FrontendChrome'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { getCurrentFrontendUser, toSidebarUser } from '@/lib/frontendSession'
 import { getDictionary } from './lib/i18n/dictionaries'
 import { resolveRequestLocale } from './lib/i18n/locale'
 import { getActiveSchools } from './lib/cmsData'
 import './styles.css'
 
-export const metadata = {
-  title: 'Campus Curator',
-  description: 'Academic blog platform for campus communities',
+export async function generateMetadata() {
+  const headers = await getHeaders()
+  const cookies = await getCookies()
+  const locale = resolveRequestLocale({
+    cookieLocale: cookies.get('locale')?.value,
+    acceptLanguage: headers.get('accept-language'),
+  })
+  const t = getDictionary(locale)
+
+  return {
+    title: t.common.appName,
+    description: t.common.appDescription,
+  }
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -27,7 +35,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   })
   const t = getDictionary(locale)
 
-  const schools = await getActiveSchools()
+  const [schools, currentUser] = await Promise.all([
+    getActiveSchools(),
+    getCurrentFrontendUser(headers),
+  ])
 
   const schoolItems = schools.map((s) => ({
     id: s.id,
@@ -45,28 +56,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className="bg-campus-surface font-body text-campus-on-surface antialiased">
         <TooltipProvider delayDuration={300}>
-          <SidebarNav schools={schoolItems} locale={locale} t={t} />
-          <HideOnEditor>
-            {githubUrl ? (
-              <a
-                href={githubUrl}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="fixed top-4 right-4 z-50 h-9 w-9 rounded-full bg-white/70 backdrop-blur-md shadow-sm border border-campus-primary/10 hover:bg-white/90 transition-all flex items-center justify-center text-campus-primary"
-                aria-label="GitHub"
-                title="GitHub"
-              >
-                <IconBrandGithub size={18} />
-              </a>
-            ) : null}
-            <LanguageSwitcher
-              locale={locale}
-              label={t.common.languageLabel}
-              zhLabel={t.common.languageZh}
-              enLabel={t.common.languageEn}
-            />
-          </HideOnEditor>
-          <main className="lg:ml-72 min-h-screen">{children}</main>
+          <FrontendChrome
+            schools={schoolItems}
+            locale={locale}
+            t={t}
+            currentUser={toSidebarUser(currentUser)}
+            githubUrl={githubUrl}
+          >
+            {children}
+          </FrontendChrome>
         </TooltipProvider>
       </body>
     </html>

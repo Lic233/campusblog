@@ -2,7 +2,9 @@ import enUS from '../../locales/en-US.json'
 import zhCN from '../../locales/zh-CN.json'
 import { DEFAULT_LOCALE, type AppLocale } from './config'
 
-type Dictionary = typeof enUS
+export type FrontendDictionary = typeof enUS
+
+type Dictionary = FrontendDictionary
 
 const dictionaries: Record<AppLocale, Dictionary> = {
   'en-US': enUS,

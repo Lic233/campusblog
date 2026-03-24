@@ -16,14 +16,15 @@ export const setCurrentAuthor: CollectionBeforeValidateHook = ({ data, operation
   const userID = req.user?.id
   const isAdmin = hasAdminRole(req.user)
 
-  if (!isAdmin && operation === 'update' && Object.hasOwn(nextData, 'author')) {
-    delete nextData.author
-  }
-
   if (userID && operation === 'create') {
     if (!isAdmin || !nextData.author) {
       nextData.author = userID
     }
+  }
+
+  // Keep the required author relationship stable for non-admin frontend updates.
+  if (userID && operation === 'update' && !isAdmin) {
+    nextData.author = userID
   }
 
   if (!isAdmin && nextData.status === 'hidden') {

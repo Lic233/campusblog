@@ -20,6 +20,8 @@ type PostCardProps = {
   publishedLabel?: string | null
   readingMinutes?: number | null
   aspectClass?: string
+  anonymousLabel: string
+  readTimeLabel: string
 }
 
 const ASPECT_CLASSES = [
@@ -37,9 +39,7 @@ export function getAspectClass(index: number): string {
 
 function NotebookPreview({ text }: { text: string }) {
   return (
-    <div className="w-full h-full relative bg-[#fefcf3] overflow-hidden select-none">
-      {/* Paper texture gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#fefcf3] via-[#fdf8ee] to-[#faf3e4]" />
+    <div className="relative h-full w-full overflow-hidden bg-gradient-to-b from-[#fefcf3] via-[#fdf8ee] to-[#faf3e4] select-none">
       {/* Ruled lines */}
       <div
         className="absolute inset-0"
@@ -52,8 +52,8 @@ function NotebookPreview({ text }: { text: string }) {
       {/* Left margin line */}
       <div className="absolute left-10 top-0 bottom-0 w-px bg-[#e8b4b8]/45" />
       {/* Hole punches */}
-      <div className="absolute left-2.5 top-6 w-3.5 h-3.5 rounded-full border border-[#d0c8bc]/40" />
-      <div className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border border-[#d0c8bc]/40" />
+      <div className="absolute left-2.5 top-6 h-3.5 w-3.5 rounded-full border border-[#d0c8bc]/40 bg-[#f8f2e7]" />
+      <div className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full border border-[#d0c8bc]/40 bg-[#f8f2e7]" />
       {/* Text content */}
       <div className="relative z-10 pl-14 pr-5 pt-3 pb-2">
         <p className="text-[15px] leading-[30px] text-[#4a4540]/82 font-body line-clamp-[5] whitespace-pre-wrap break-words">
@@ -79,16 +79,18 @@ export default function PostCard({
   publishedLabel,
   readingMinutes,
   aspectClass = 'aspect-[5/4]',
+  anonymousLabel,
+  readTimeLabel,
 }: PostCardProps) {
   const previewText = excerpt || contentText || ''
   const hasImage = Boolean(coverImageUrl)
 
   return (
-    <div className="masonry-item w-[96%] mx-auto">
-      <Link href={`/post/${slug}`} className="no-underline block group">
-        <CardSpotlight className="bg-card rounded-xl overflow-hidden shadow-sm border border-transparent hover:border-campus-primary/10 hover:shadow-[0_8px_30px_rgba(13,59,102,0.1)] transition-all duration-300 transform hover:scale-[1.02]">
+    <div className="masonry-item w-full">
+      <Link href={`/post/${slug}`} className="group block w-full no-underline">
+        <CardSpotlight className="w-full bg-card rounded-xl overflow-hidden border border-transparent shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-campus-primary/10 hover:shadow-[0_8px_30px_rgba(13,59,102,0.1)]">
           {/* Cover / Notebook Preview */}
-          <div className={`relative ${aspectClass} max-h-56 overflow-hidden sm:max-h-60`}>
+          <div className={`relative w-full ${aspectClass} max-h-56 overflow-hidden sm:max-h-60`}>
             {hasImage ? (
               <img
                 alt={coverImageAlt || title}
@@ -98,18 +100,6 @@ export default function PostCard({
             ) : (
               <NotebookPreview text={previewText} />
             )}
-            {tagLabel && (
-              <Badge
-                variant="secondary"
-                className={`absolute top-2.5 left-2.5 text-[11px] font-label font-bold uppercase tracking-wider shadow-sm ${
-                  hasImage
-                    ? 'bg-white/20 backdrop-blur-md border-white/10 text-white'
-                    : 'bg-[#4a4540]/8 backdrop-blur-sm border-[#4a4540]/10 text-[#4a4540]/70'
-                }`}
-              >
-                {tagLabel}
-              </Badge>
-            )}
             {hasImage && (
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             )}
@@ -117,8 +107,16 @@ export default function PostCard({
 
           {/* Content */}
           <div className="p-4 space-y-2.5">
-            {(schoolName || channelName) && (
+            {(tagLabel || schoolName || channelName) && (
               <div className="flex flex-wrap gap-1.5">
+                {tagLabel ? (
+                  <Badge
+                    variant="secondary"
+                    className="bg-[#4a4540]/8 text-[#4a4540]/70 border-[#4a4540]/10"
+                  >
+                    {tagLabel}
+                  </Badge>
+                ) : null}
                 {schoolName ? (
                   <Badge
                     variant="secondary"
@@ -149,7 +147,7 @@ export default function PostCard({
                   </AvatarFallback>
                 </Avatar>
                 <span className="text-[13px] font-label text-foreground/60">
-                  {authorName || 'Anonymous'}
+                  {authorName || anonymousLabel}
                 </span>
               </div>
               <div className="flex flex-col items-end gap-1 text-[12px] font-label text-foreground/50">
@@ -162,7 +160,7 @@ export default function PostCard({
                 {readingMinutes ? (
                   <span className="inline-flex items-center gap-1">
                     <IconClockHour4 size={14} />
-                    {readingMinutes} min
+                    {readingMinutes} {readTimeLabel}
                   </span>
                 ) : null}
               </div>

@@ -29,27 +29,28 @@ const EMPTY_TIPTAP_DOC = {
   ],
 }
 
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 80) || `post-${Date.now()}`
-}
-
-function toNumericId(value: string | number | undefined): number | undefined {
+function toNumericId(value: string | number | undefined | null): number | undefined {
   if (value === undefined || value === null || value === '') return undefined
   const num = Number(value)
   return Number.isFinite(num) ? num : undefined
 }
 
-export async function POST(request: Request) {
+export async function PATCH(
+  request: Request,
+  context: { params: Promise<{ id: string }> },
+) {
   try {
     const locale = resolveRequestLocale({
       acceptLanguage: request.headers.get('accept-language'),
     })
     const t = getDictionary(locale)
+    const { id } = await context.params
+    const postId = toNumericId(id)
+
+    if (!postId) {
+      return Response.json({ error: t.post.notFoundTitle }, { status: 400 })
+    }
+
     const body = (await request.json()) as PostRequestBody
     const { title, content, school, subChannel, tags, excerpt, coverImage, status } = body
     const nextStatus = status === 'draft' ? 'draft' : 'published'
@@ -71,38 +72,41 @@ export async function POST(request: Request) {
       return Response.json({ error: t.editor.authRequired }, { status: 401 })
     }
 
-    const normalizedTitle =
-      title && typeof title === 'string' && title.trim()
-        ? title.trim()
-        : `Untitled Draft ${Date.now().toString(36)}`
-    const normalizedContent = content ?? EMPTY_TIPTAP_DOC
-    const slug = slugify(normalizedTitle) + '-' + Date.now().toString(36)
-
     const schoolId = toNumericId(school)
     if (!schoolId) {
       return Response.json({ error: t.editor.schoolRequired }, { status: 400 })
     }
 
+    const normalizedTitle =
+      title && typeof title === 'string' && title.trim()
+        ? title.trim()
+        : `Untitled Draft ${Date.now().toString(36)}`
+    const normalizedContent = content ?? EMPTY_TIPTAP_DOC
+
     const data: Record<string, unknown> = {
       title: normalizedTitle,
-      slug,
       content: normalizedContent,
       school: schoolId,
       status: nextStatus,
+      excerpt: excerpt?.trim() || null,
+      subChannel: null,
     }
 
     const subChannelId = toNumericId(subChannel)
     if (subChannelId) data.subChannel = subChannelId
 
-    if (excerpt) data.excerpt = excerpt
-    if (coverImage) data.coverImage = toNumericId(coverImage)
-
-    if (tags && Array.isArray(tags) && tags.length > 0) {
-      data.tags = tags.map((t) => toNumericId(t)).filter(Boolean)
+    if (coverImage !== undefined) {
+      data.coverImage = toNumericId(coverImage) ?? null
     }
 
-    const post = await payload.create({
+    data.tags =
+      tags && Array.isArray(tags) && tags.length > 0
+        ? tags.map((tag) => toNumericId(tag)).filter(Boolean)
+        : []
+
+    const post = await payload.update({
       collection: 'posts',
+      id: postId,
       overrideAccess: false,
       user,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -116,7 +120,7 @@ export async function POST(request: Request) {
     after(() => {
       const channelInfo = subChannelId ? ` channel=${subChannelId}` : ''
       console.info(
-        `[posts:create] id=${post.id} slug=${post.slug} school=${schoolId}${channelInfo}`,
+        `[posts:update] id=${post.id} slug=${post.slug} school=${schoolId}${channelInfo} status=${nextStatus}`,
       )
     })
 
@@ -126,7 +130,7 @@ export async function POST(request: Request) {
     })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
-    console.error('POST /api/posts error:', message)
+    console.error('PATCH /api/posts/[id] error:', message)
     return Response.json({ error: message }, { status: 500 })
   }
 }

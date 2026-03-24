@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { IconLanguage } from '@tabler/icons-react'
 
 import { SUPPORTED_LOCALES, type AppLocale } from '@/app/(frontend)/lib/i18n/config'
+import { cn } from '@/lib/utils'
 import {
   Select,
   SelectContent,
@@ -18,6 +19,7 @@ type LanguageSwitcherProps = {
   label: string
   zhLabel: string
   enLabel: string
+  className?: string
 }
 
 const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365
@@ -31,6 +33,7 @@ export default function LanguageSwitcher({
   label,
   zhLabel,
   enLabel,
+  className,
 }: LanguageSwitcherProps) {
   const router = useRouter()
 
@@ -41,7 +44,7 @@ export default function LanguageSwitcher({
   }
 
   return (
-    <div className="fixed top-4 right-16 z-50" aria-label={label}>
+    <div className={cn('fixed top-4 right-16 z-50', className)} aria-label={label}>
       <Select value={locale} onValueChange={handleLocaleValueChange}>
         <SelectTrigger
           className="h-9 gap-1.5 rounded-full bg-white/70 backdrop-blur-md shadow-sm border-campus-primary/10 hover:bg-white/90 transition-all px-3"

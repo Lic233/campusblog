@@ -4,19 +4,22 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   IconCompass,
-  IconSchool,
-  IconPlus,
   IconPencil,
+  IconPlus,
+  IconSchool,
+  IconSparkles,
   IconUser,
 } from '@tabler/icons-react'
 
+import { buildAuthHref } from '@/lib/authNavigation'
+import type { SidebarUser } from '@/lib/sessionTypes'
 import { cn } from '@/lib/utils'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { GradientText } from '@/components/ui/gradient-text'
 import { MovingBorderLink } from '@/components/ui/moving-border'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
+import { Tooltip, TooltipTrigger } from '@/components/ui/tooltip'
 import type { AppLocale } from '@/app/(frontend)/lib/i18n/config'
 
 type SchoolItem = {
@@ -31,6 +34,8 @@ type SidebarDictionary = {
     appTagline: string
     createPost: string
     login: string
+    register: string
+    userCenter: string
     languageLabel: string
     languageZh: string
     languageEn: string
@@ -46,21 +51,25 @@ type SidebarNavProps = {
   schools: SchoolItem[]
   locale: AppLocale
   t: SidebarDictionary
+  currentUser: SidebarUser | null
 }
 
-export default function SidebarNav({ schools, locale, t }: SidebarNavProps) {
+export default function SidebarNav({ schools, locale, t, currentUser }: SidebarNavProps) {
   const pathname = usePathname()
   const isDiscover = pathname === '/'
+  const authNextPath =
+    pathname && pathname !== '/login' && pathname !== '/register' ? pathname : undefined
+  const loginHref = buildAuthHref('/login', authNextPath)
+  const createPostHref = currentUser ? '/editor' : buildAuthHref('/login', '/editor')
 
   return (
-    <aside className="fixed left-0 top-0 h-full w-72 z-50 bg-white/70 backdrop-blur-xl shadow-[0_6px_24px_rgba(13,59,102,0.08)] border-r border-campus-primary/5 hidden lg:flex flex-col">
-      {/* Brand */}
-      <div className="px-7 pt-8 pb-6">
-        <Link href="/" className="block no-underline group">
+    <aside className="fixed left-0 top-0 z-50 hidden h-full w-72 flex-col border-r border-campus-primary/5 bg-white/70 shadow-[0_6px_24px_rgba(13,59,102,0.08)] backdrop-blur-xl lg:flex">
+      <div className="px-7 pb-6 pt-8">
+        <Link href="/" className="group block no-underline">
           <GradientText as="h1" className="font-headline text-3xl font-bold">
             {t.common.appName}
           </GradientText>
-          <p className="font-label text-xs uppercase tracking-[0.15em] text-muted-foreground/60 mt-1.5 group-hover:text-muted-foreground/80 transition-colors">
+          <p className="mt-1.5 font-label text-xs uppercase tracking-[0.15em] text-muted-foreground/60 transition-colors group-hover:text-muted-foreground/80">
             {t.common.appTagline}
           </p>
         </Link>
@@ -68,16 +77,14 @@ export default function SidebarNav({ schools, locale, t }: SidebarNavProps) {
 
       <Separator className="mx-6 mb-2 bg-campus-primary/5" />
 
-      {/* Navigation */}
       <ScrollArea className="flex-1 px-3">
         <nav className="space-y-1 py-2">
-          {/* Discover */}
           <Link
             href="/"
             className={cn(
-              'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 no-underline group',
+              'group flex items-center gap-3 rounded-lg px-4 py-3 transition-all duration-200 no-underline',
               isDiscover
-                ? 'bg-campus-primary/8 text-campus-primary font-semibold shadow-sm shadow-campus-primary/5 border-r-[3px] border-campus-accent'
+                ? 'border-r-[3px] border-campus-accent bg-campus-primary/8 font-semibold text-campus-primary shadow-sm shadow-campus-primary/5'
                 : 'text-foreground/70 hover:bg-campus-primary/5 hover:text-campus-primary',
             )}
           >
@@ -92,9 +99,8 @@ export default function SidebarNav({ schools, locale, t }: SidebarNavProps) {
             <span className="font-label text-base">{t.sidebar.discover}</span>
           </Link>
 
-          {/* Channels Section */}
-          <div className="pt-5 pb-1 px-1">
-            <h3 className="font-label text-xs uppercase tracking-[0.15em] text-muted-foreground/50 font-bold mb-3 px-3">
+          <div className="px-1 pb-1 pt-5">
+            <h3 className="mb-3 px-3 font-label text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground/50">
               {t.sidebar.channels}
             </h3>
 
@@ -102,15 +108,16 @@ export default function SidebarNav({ schools, locale, t }: SidebarNavProps) {
               {schools.map((school) => {
                 const schoolPath = `/school/${school.slug}`
                 const isActive = pathname.startsWith(schoolPath)
+
                 return (
                   <Tooltip key={school.id}>
                     <TooltipTrigger asChild>
                       <Link
                         href={schoolPath}
                         className={cn(
-                          'flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 group no-underline',
+                          'group flex items-center gap-3 rounded-lg px-4 py-2.5 transition-all duration-200 no-underline',
                           isActive
-                            ? 'bg-campus-primary/8 text-campus-primary font-semibold shadow-sm shadow-campus-primary/5'
+                            ? 'bg-campus-primary/8 font-semibold text-campus-primary shadow-sm shadow-campus-primary/5'
                             : 'text-foreground/70 hover:bg-campus-primary/5 hover:text-campus-primary',
                         )}
                       >
@@ -122,18 +129,17 @@ export default function SidebarNav({ schools, locale, t }: SidebarNavProps) {
                             !isActive && 'group-hover:scale-110 group-hover:text-campus-teal',
                           )}
                         />
-                        <span className="font-label text-base truncate">{school.name}</span>
+                        <span className="truncate font-label text-base">{school.name}</span>
                       </Link>
                     </TooltipTrigger>
                   </Tooltip>
                 )
               })}
 
-              {/* Add Channel */}
-              <button className="flex items-center gap-3 px-4 py-2.5 text-campus-accent/60 hover:text-campus-accent hover:bg-campus-accent/5 transition-all duration-200 mt-1 w-full rounded-lg group">
+              <button className="group mt-1 flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-campus-accent/60 transition-all duration-200 hover:bg-campus-accent/5 hover:text-campus-accent">
                 <IconPlus
                   size={20}
-                  className="shrink-0 group-hover:rotate-90 transition-transform duration-300"
+                  className="shrink-0 transition-transform duration-300 group-hover:rotate-90"
                 />
                 <span className="font-label text-sm font-bold uppercase tracking-wider">
                   {t.sidebar.addChannel}
@@ -146,11 +152,9 @@ export default function SidebarNav({ schools, locale, t }: SidebarNavProps) {
 
       <Separator className="mx-6 mt-2 bg-campus-primary/5" />
 
-      {/* Bottom Section */}
-      <div className="p-5 space-y-4">
-        {/* Create Post - Aceternity MovingBorder */}
+      <div className="space-y-4 p-5">
         <MovingBorderLink
-          href="/editor"
+          href={createPostHref}
           containerClassName="w-full"
           className="font-label font-bold text-base"
         >
@@ -158,17 +162,54 @@ export default function SidebarNav({ schools, locale, t }: SidebarNavProps) {
           {t.common.createPost}
         </MovingBorderLink>
 
-        {/* User */}
-        <div className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-campus-primary/5 transition-colors duration-200 cursor-pointer">
-          <Avatar className="h-10 w-10 border border-campus-primary/10">
-            <AvatarFallback className="bg-campus-surface-container text-campus-on-surface-variant">
-              <IconUser size={20} />
-            </AvatarFallback>
-          </Avatar>
-          <span className="font-label font-semibold text-base text-campus-primary">
-            {t.common.login}
-          </span>
-        </div>
+        {currentUser ? (
+          <Link
+            href="/user/me"
+            className="block rounded-2xl border border-campus-primary/10 bg-white/70 p-3 shadow-sm no-underline transition-all hover:bg-white/90 hover:shadow-md"
+          >
+            <div className="flex items-center gap-3">
+              <Avatar className="h-11 w-11 border border-campus-primary/10">
+                {currentUser.avatarUrl ? (
+                  <AvatarImage src={currentUser.avatarUrl} alt={currentUser.displayName} />
+                ) : null}
+                <AvatarFallback className="bg-campus-surface-container text-campus-on-surface-variant">
+                  {currentUser.displayName.slice(0, 1).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <p className="truncate font-label text-base font-semibold text-campus-primary">
+                  {currentUser.displayName}
+                </p>
+                <p className="truncate text-xs font-label text-foreground/50">{currentUser.email}</p>
+                <p className="mt-1 text-xs font-label text-campus-primary/65">
+                  {t.common.userCenter}
+                </p>
+              </div>
+            </div>
+          </Link>
+        ) : (
+          <Link
+            href={loginHref}
+            className="block rounded-2xl border border-campus-primary/10 bg-white/70 p-3 shadow-sm no-underline transition-all hover:bg-white/90 hover:shadow-md"
+          >
+            <div className="flex items-center gap-3">
+              <Avatar className="h-10 w-10 border border-campus-primary/10">
+                <AvatarFallback className="bg-campus-surface-container text-campus-on-surface-variant">
+                  <IconUser size={20} />
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <p className="font-label text-base font-semibold text-campus-primary">
+                  {t.common.login}
+                </p>
+                <p className="mt-1 text-xs font-label text-foreground/50">{t.common.register}</p>
+              </div>
+              <div className="ml-auto flex h-9 w-9 items-center justify-center rounded-full bg-campus-primary/8 text-campus-primary/70">
+                <IconSparkles size={16} />
+              </div>
+            </div>
+          </Link>
+        )}
       </div>
     </aside>
   )

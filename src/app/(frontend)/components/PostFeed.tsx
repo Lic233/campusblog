@@ -1,6 +1,7 @@
 import type { Post } from '@/payload-types'
 
 import type { AppLocale } from '@/lib/i18n/config'
+import { getDictionary } from '@/app/(frontend)/lib/i18n/dictionaries'
 import {
   estimatePostReadingMinutes,
   getPostAuthor,
@@ -27,6 +28,7 @@ export default function PostFeed({
   showChannelName = true,
 }: PostFeedProps) {
   if (posts.length === 0) return null
+  const t = getDictionary(locale)
 
   return (
     <div className="masonry-grid">
@@ -56,6 +58,8 @@ export default function PostFeed({
             publishedLabel={getPostPublishedLabel(post.publishedAt ?? post.createdAt, locale)}
             readingMinutes={estimatePostReadingMinutes(post)}
             aspectClass={getAspectClass(index)}
+            anonymousLabel={t.common.anonymous}
+            readTimeLabel={t.post.readTimeShort}
           />
         )
       })}
