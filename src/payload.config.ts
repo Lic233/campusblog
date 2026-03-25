@@ -5,7 +5,7 @@ import { buildConfig } from 'payload'
 import { en } from 'payload/i18n/en'
 import { zh } from 'payload/i18n/zh'
 import { fileURLToPath } from 'url'
-import { CloudflareContext, getCloudflareContext } from '@opennextjs/cloudflare'
+import { getCloudflareContext } from '@opennextjs/cloudflare'
 import { r2Storage } from '@payloadcms/storage-r2'
 
 import { Posts } from './collections/Posts'
@@ -19,11 +19,6 @@ import { Media } from './collections/Media'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 const realpath = (value: string) => (fs.existsSync(value) ? fs.realpathSync(value) : undefined)
-
-type PlatformProxyOptions = {
-  environment?: string
-  remoteBindings?: boolean
-}
 
 const isCLI = process.argv.some((value) => realpath(value)?.endsWith(path.join('payload', 'bin.js')) ?? false)
 const isProduction = process.env.NODE_ENV === 'production'
@@ -50,7 +45,9 @@ const cloudflareLogger = {
 
 const cloudflare =
   isCLI || !isProduction
-    ? await getCloudflareContextFromWrangler()
+    ? await import('./payload.wrangler').then(({ getCloudflareContextFromWrangler }) =>
+        getCloudflareContextFromWrangler(isProduction),
+      )
     : await getCloudflareContext({ async: true })
 
 export default buildConfig({
@@ -81,14 +78,3 @@ export default buildConfig({
     }),
   ],
 })
-
-// Adapted from https://github.com/opennextjs/opennextjs-cloudflare/blob/d00b3a13e42e65aad76fba41774815726422cc39/packages/cloudflare/src/api/cloudflare-context.ts#L328C36-L328C46
-function getCloudflareContextFromWrangler(): Promise<CloudflareContext> {
-  return import(/* webpackIgnore: true */ `${'__wrangler'.replaceAll('_', '')}`).then(
-    ({ getPlatformProxy }) =>
-      getPlatformProxy({
-        environment: process.env.CLOUDFLARE_ENV,
-        remoteBindings: isProduction,
-      } satisfies PlatformProxyOptions),
-  )
-}
