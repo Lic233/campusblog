@@ -3,7 +3,7 @@ import { defineCloudflareConfig } from '@opennextjs/cloudflare/config'
 
 const config = defineCloudflareConfig({})
 
-export default {
+const openNextConfig = {
   ...config,
   edgeExternals: [
     ...(config.edgeExternals ?? []),
@@ -13,3 +13,5 @@ export default {
     'drizzle-orm',
   ],
 }
+
+export default openNextConfig

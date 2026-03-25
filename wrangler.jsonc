@@ -52,7 +52,7 @@
       "binding": "KV",
       "id": "031e28dcedc94d33bc2bf357aebb88cf",
     },
-  ],"env": {"%CLOUDFLARE_ENV%":{"name":"campusblog"}},
+  ],
   // Here's how to configure an additional environment
   // It can be deployed with `CLOUDFLARE_ENV=staging pnpm run deploy`
   // "env": {
