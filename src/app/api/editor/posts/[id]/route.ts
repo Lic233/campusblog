@@ -3,7 +3,7 @@ import { after } from 'next/server'
 
 import { getDictionary } from '@/app/(frontend)/lib/i18n/dictionaries'
 import { resolveRequestLocale } from '@/app/(frontend)/lib/i18n/locale'
-import { PayloadRESTError, createPayloadRESTClient } from '@/lib/payloadREST'
+import { PayloadRESTError, createPayloadRESTClient } from '../../../../../lib/payloadREST'
 import { projectQuotaForPublishedPostREST } from '@/quota/postQuotaREST'
 
 export const runtime = 'nodejs'
@@ -184,7 +184,11 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     }
 
     const message =
-      err instanceof PayloadRESTError ? err.message : err instanceof Error ? err.message : 'Unknown error'
+      err instanceof PayloadRESTError
+        ? err.message
+        : err instanceof Error
+          ? err.message
+          : 'Unknown error'
     console.error('PATCH /api/editor/posts/[id] error:', message)
     return Response.json({ error: message }, { status: 500 })
   }
@@ -227,8 +231,14 @@ export async function DELETE(request: Request, context: { params: Promise<{ id: 
     }
 
     const message =
-      err instanceof PayloadRESTError ? err.message : err instanceof Error ? err.message : 'Unknown error'
+      err instanceof PayloadRESTError
+        ? err.message
+        : err instanceof Error
+          ? err.message
+          : 'Unknown error'
     console.error('DELETE /api/editor/posts/[id] error:', message)
     return Response.json({ error: message }, { status: 500 })
   }
 }
+
+

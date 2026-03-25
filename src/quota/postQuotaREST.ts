@@ -1,5 +1,3 @@
-import type { PayloadRESTError } from '@/lib/payloadREST'
-
 type RelationValue =
   | number
   | string
@@ -253,3 +251,4 @@ export async function projectQuotaForPublishedPostREST(args: {
     usedBytes,
   }
 }
+
