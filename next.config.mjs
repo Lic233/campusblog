@@ -24,10 +24,6 @@ const nextConfig = {
     webpackConfig.resolve.alias = {
       ...webpackConfig.resolve.alias,
       app: path.resolve(__dirname, 'src/app'),
-      // Payload's D1 adapter exposes drizzle-kit migration helpers through runtime code.
-      // Next 16/OpenNext may try to bundle that optional path into the server worker,
-      // which breaks Cloudflare bundling even though request handling never uses it.
-      'drizzle-kit/api': path.resolve(__dirname, 'src/shims/drizzle-kit-api.ts'),
     }
 
     return webpackConfig
