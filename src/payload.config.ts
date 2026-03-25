@@ -6,7 +6,6 @@ import { en } from 'payload/i18n/en'
 import { zh } from 'payload/i18n/zh'
 import { fileURLToPath } from 'url'
 import { CloudflareContext, getCloudflareContext } from '@opennextjs/cloudflare'
-import { GetPlatformProxyOptions } from 'wrangler'
 import { r2Storage } from '@payloadcms/storage-r2'
 
 import { Posts } from './collections/Posts'
@@ -21,7 +20,12 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 const realpath = (value: string) => (fs.existsSync(value) ? fs.realpathSync(value) : undefined)
 
-const isCLI = process.argv.some((value) => realpath(value).endsWith(path.join('payload', 'bin.js')))
+type PlatformProxyOptions = {
+  environment?: string
+  remoteBindings?: boolean
+}
+
+const isCLI = process.argv.some((value) => realpath(value)?.endsWith(path.join('payload', 'bin.js')) ?? false)
 const isProduction = process.env.NODE_ENV === 'production'
 
 const createLog =
@@ -85,6 +89,6 @@ function getCloudflareContextFromWrangler(): Promise<CloudflareContext> {
       getPlatformProxy({
         environment: process.env.CLOUDFLARE_ENV,
         remoteBindings: isProduction,
-      } satisfies GetPlatformProxyOptions),
+      } satisfies PlatformProxyOptions),
   )
 }
