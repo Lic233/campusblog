@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { uploadMediaFile } from '../../lib/mediaUpload'
 
 type UserProfileEditorProps = {
   avatarUrl?: string
@@ -30,18 +31,6 @@ type UserProfileEditorProps = {
   userId: number | string
 }
 
-function buildAvatarAlt(userId: number | string, displayName: string): string {
-  const normalizedName = displayName
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9\u4e00-\u9fa5_-]+/gi, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '')
-
-  const safeName = normalizedName || 'user'
-  return `profile-avatar-${String(userId)}-${safeName}`
-}
-
 function extractMessage(payload: unknown, fallback: string): string {
   if (!payload || typeof payload !== 'object') return fallback
 
@@ -58,18 +47,6 @@ function extractMessage(payload: unknown, fallback: string): string {
   }
 
   return fallback
-}
-
-function extractCreatedId(payload: unknown): string | number | null {
-  if (!payload || typeof payload !== 'object') return null
-  if ('id' in payload && (typeof payload.id === 'string' || typeof payload.id === 'number')) {
-    return payload.id
-  }
-  if ('doc' in payload && payload.doc && typeof payload.doc === 'object' && 'id' in payload.doc) {
-    const docId = payload.doc.id
-    if (typeof docId === 'string' || typeof docId === 'number') return docId
-  }
-  return null
 }
 
 export default function UserProfileEditor({
@@ -119,24 +96,13 @@ export default function UserProfileEditor({
       let avatarId: string | number | null = null
 
       if (selectedFile) {
-        const avatarAlt = buildAvatarAlt(userId, trimmedDisplayName)
-        const formData = new FormData()
-        formData.append('_payload', JSON.stringify({ alt: avatarAlt }))
-        formData.append('alt', avatarAlt)
-        formData.append('file', selectedFile)
-
-        const mediaResponse = await fetch('/api/media', {
-          method: 'POST',
-          body: formData,
+        const media = await uploadMediaFile({
+          fallbackError: copy.profileError,
+          file: selectedFile,
+          kind: 'avatar',
+          seed: userId,
         })
-        const mediaPayload = await mediaResponse.json().catch((): null => null)
-
-        if (!mediaResponse.ok) {
-          setError(extractMessage(mediaPayload, copy.profileError))
-          return
-        }
-
-        avatarId = extractCreatedId(mediaPayload)
+        avatarId = media.id
       }
 
       const updateResponse = await fetch(`/api/users/${encodeURIComponent(String(userId))}`, {

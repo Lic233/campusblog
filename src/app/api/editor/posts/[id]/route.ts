@@ -4,7 +4,7 @@ import { after } from 'next/server'
 import { getDictionary } from '@/app/(frontend)/lib/i18n/dictionaries'
 import { resolveRequestLocale } from '@/app/(frontend)/lib/i18n/locale'
 import { PayloadRESTError, createPayloadRESTClient } from '../../../../../lib/payloadREST'
-import { projectQuotaForPublishedPostREST } from '@/quota/postQuotaREST'
+import { projectQuotaForPostREST } from '@/quota/postQuotaREST'
 
 export const runtime = 'nodejs'
 export const maxDuration = 15
@@ -136,29 +136,27 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
         ? tags.map((tag) => toNumericId(tag)).filter(Boolean)
         : []
 
-    if (nextStatus === 'published') {
-      const projection = await projectQuotaForPublishedPostREST({
-        candidatePost: {
-          content: normalizedContent,
-          coverImage: coverImageId ?? toRelationId(existingPost.coverImage) ?? null,
-          excerpt: excerpt?.trim() || null,
-          title: normalizedTitle,
-        },
-        client: payload,
-        excludePostId: postId,
-        quotaBytes: currentUser.quotaBytes,
-        userId: currentUser.id,
-      })
+    const projection = await projectQuotaForPostREST({
+      candidatePost: {
+        content: normalizedContent,
+        coverImage: coverImageId ?? toRelationId(existingPost.coverImage) ?? null,
+        excerpt: excerpt?.trim() || null,
+        title: normalizedTitle,
+      },
+      client: payload,
+      excludePostId: postId,
+      quotaBytes: currentUser.quotaBytes,
+      userId: currentUser.id,
+    })
 
-      if (!projection.allowed) {
-        return Response.json(
-          {
-            error: `${t.editor.quotaExceeded} ${t.userCenter.remainingQuota}: ${formatBytes(projection.remainingBytes, locale)}. ${t.editor.requiredQuota}: ${formatBytes(projection.requiredBytes, locale)}.`,
-            quota: projection,
-          },
-          { status: 400 },
-        )
-      }
+    if (!projection.allowed) {
+      return Response.json(
+        {
+          error: `${t.editor.quotaExceeded} ${t.userCenter.remainingQuota}: ${formatBytes(projection.remainingBytes, locale)}. ${t.editor.requiredQuota}: ${formatBytes(projection.requiredBytes, locale)}.`,
+          quota: projection,
+        },
+        { status: 400 },
+      )
     }
 
     const post = await payload.update<PostDoc>('posts', postId, data)
@@ -240,4 +238,3 @@ export async function DELETE(request: Request, context: { params: Promise<{ id: 
     return Response.json({ error: message }, { status: 500 })
   }
 }
-

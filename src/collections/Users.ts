@@ -1,6 +1,11 @@
 import type { CollectionConfig } from 'payload'
 
 import { adminOnly, adminOrSelf, hasAdminRole } from '@/access/admin'
+import {
+  cleanupDetachedUserMediaAfterChange,
+  cleanupDetachedUserMediaAfterDelete,
+} from '@/hooks/cleanupDetachedUserMedia'
+import { preventAdminPasswordChange } from '@/hooks/preventAdminPasswordChange'
 
 const canReadOwnOrAdmin = ({
   req: { user },
@@ -17,6 +22,11 @@ const canReadOwnOrAdmin = ({
 export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
+    components: {
+      edit: {
+        beforeDocumentControls: ['/components/admin/UserPasswordChangeNotice'],
+      },
+    },
     defaultColumns: ['displayName', 'email', 'roles', 'isActive', 'updatedAt'],
     useAsTitle: 'displayName',
   },
@@ -26,6 +36,11 @@ export const Users: CollectionConfig = {
     create: () => true,
     update: adminOrSelf,
     delete: adminOnly,
+  },
+  hooks: {
+    beforeChange: [preventAdminPasswordChange],
+    afterChange: [cleanupDetachedUserMediaAfterChange],
+    afterDelete: [cleanupDetachedUserMediaAfterDelete],
   },
   fields: [
     {

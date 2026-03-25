@@ -2,6 +2,7 @@ import type { Post } from '@/payload-types'
 
 import type { AppLocale } from '@/lib/i18n/config'
 import { getDictionary } from '@/app/(frontend)/lib/i18n/dictionaries'
+import { getMediaImageAlt } from '@/app/(frontend)/lib/mediaAlt'
 import {
   estimatePostReadingMinutes,
   getPostAuthor,
@@ -49,7 +50,7 @@ export default function PostFeed({
             excerpt={post.excerpt}
             contentText={getPostPreviewText(post)}
             coverImageUrl={coverImage?.url}
-            coverImageAlt={coverImage?.alt ?? post.title}
+            coverImageAlt={getMediaImageAlt(coverImage?.alt, 'cover-image')}
             authorName={author?.displayName}
             authorAvatarUrl={authorAvatar}
             tagLabel={primaryTag?.name}

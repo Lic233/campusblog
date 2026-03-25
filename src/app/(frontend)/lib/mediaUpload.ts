@@ -1,3 +1,5 @@
+import { buildGeneratedMediaAlt, type MediaAltKind } from './mediaAlt'
+
 export type UploadedMedia = {
   alt?: string | null
   id: number | string
@@ -23,13 +25,19 @@ function extractMessage(payload: unknown, fallback: string): string {
 }
 
 export async function uploadMediaFile(args: {
-  alt: string
   file: File
   fallbackError: string
+  kind: MediaAltKind
+  seed?: string | number | null
 }): Promise<UploadedMedia> {
+  const generatedAlt = buildGeneratedMediaAlt({
+    file: args.file,
+    kind: args.kind,
+    seed: args.seed,
+  })
   const formData = new FormData()
-  formData.append('_payload', JSON.stringify({ alt: args.alt }))
-  formData.append('alt', args.alt)
+  formData.append('_payload', JSON.stringify({ alt: generatedAlt }))
+  formData.append('alt', generatedAlt)
   formData.append('file', args.file)
 
   const response = await fetch('/api/media', {
@@ -60,7 +68,7 @@ export async function uploadMediaFile(args: {
   }
 
   return {
-    alt: payload?.alt ?? payload?.doc?.alt ?? args.alt,
+    alt: payload?.alt ?? payload?.doc?.alt ?? generatedAlt,
     id,
     url: payload?.url ?? payload?.doc?.url,
   }

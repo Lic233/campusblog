@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { sanitizeNextPath } from '@/lib/authNavigation'
 import { getFrontendPayload, getCurrentFrontendUser } from '@/lib/frontendSession'
 import { getPostSchool, getPostSubChannel } from '@/lib/postPresentation'
+import { getPostUsageBytesMap } from '@/quota/postQuota'
 import { getDictionary } from '../../lib/i18n/dictionaries'
 import { resolveRequestLocale } from '../../lib/i18n/locale'
 
@@ -45,14 +46,16 @@ function UserPostList({
   locale,
   metaLabel,
   posts,
+  postUsageBytes,
   t,
 }: {
   actionHref?: (post: Post) => string | null
   emptyLabel: string
   hrefLabel: string
   locale: string
-  metaLabel: string
+  metaLabel: string | null
   posts: Post[]
+  postUsageBytes: Map<string, number>
   t: ReturnType<typeof getDictionary>
 }) {
   if (posts.length === 0) {
@@ -72,9 +75,11 @@ function UserPostList({
           >
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <div className="font-label text-xs uppercase tracking-[0.18em] text-foreground/40">
-                  {metaLabel}
-                </div>
+                {metaLabel ? (
+                  <div className="font-label text-xs uppercase tracking-[0.18em] text-foreground/40">
+                    {metaLabel}
+                  </div>
+                ) : null}
                 <h3 className="mt-2 font-headline text-xl leading-snug text-campus-primary">
                   {post.title}
                 </h3>
@@ -99,11 +104,17 @@ function UserPostList({
                 <p className="mt-3 text-sm font-label text-foreground/55">
                   {formatDate(post.publishedAt ?? post.updatedAt, locale)}
                 </p>
+                <p className="mt-2 text-sm font-label text-foreground/55">
+                  {t.userCenter.usedQuota}:{' '}
+                  {formatBytes(postUsageBytes.get(String(post.id)) ?? 0, locale)}
+                </p>
               </div>
 
               <UserPostActions
                 actionHref={actionHref?.(post)}
                 actionLabel={hrefLabel}
+                cancelLabel={t.common.cancel}
+                confirmActionLabel={t.common.confirm}
                 confirmLabel={t.userCenter.deletePostConfirm}
                 deleteErrorLabel={t.userCenter.deletePostError}
                 deleteLabel={t.userCenter.deletePost}
@@ -156,6 +167,10 @@ export default async function UserCenterPage() {
       overrideAccess: false,
     }),
   ])
+  const postUsageBytes = await getPostUsageBytesMap({
+    payload,
+    posts: [...draftPostsResult.docs, ...publishedPostsResult.docs],
+  })
 
   const quotaBytes = currentUser.quotaBytes ?? 0
   const usedBytes = currentUser.usedBytes ?? 0
@@ -275,6 +290,7 @@ export default async function UserCenterPage() {
               locale={locale}
               metaLabel={t.userCenter.updatedAt}
               posts={draftPostsResult.docs}
+              postUsageBytes={postUsageBytes}
               t={t}
             />
           </CardContent>
@@ -292,8 +308,9 @@ export default async function UserCenterPage() {
               emptyLabel={t.userCenter.emptyPublished}
               hrefLabel={t.userCenter.viewPublicPost}
               locale={locale}
-              metaLabel={t.userCenter.publishedAt}
+              metaLabel={null}
               posts={publishedPostsResult.docs}
+              postUsageBytes={postUsageBytes}
               t={t}
             />
           </CardContent>

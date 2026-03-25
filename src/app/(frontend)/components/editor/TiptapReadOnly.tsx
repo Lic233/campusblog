@@ -9,13 +9,22 @@ import { tiptapExtensions } from '../../lib/tiptap-extensions'
 export type TiptapReadOnlyProps = {
   content: JSONContent | null | undefined
   className?: string
+  contentClassName?: string
+  loadingClassName?: string
+  bordered?: boolean
 }
 
 /**
  * Renders stored ProseMirror JSON as read-only output in the browser.
  * Uses the same extension set as TiptapEditor so the schema stays consistent.
  */
-export function TiptapReadOnly({ content, className = '' }: TiptapReadOnlyProps) {
+export function TiptapReadOnly({
+  content,
+  className = '',
+  contentClassName = 'tiptap-readonly px-3 py-2',
+  loadingClassName = '',
+  bordered = true,
+}: TiptapReadOnlyProps) {
   const editor = useEditor({
     extensions: tiptapExtensions,
     content: content ?? { type: 'doc', content: [] },
@@ -23,7 +32,7 @@ export function TiptapReadOnly({ content, className = '' }: TiptapReadOnlyProps)
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: 'tiptap-readonly px-3 py-2',
+        class: contentClassName,
       },
     },
   })
@@ -42,14 +51,18 @@ export function TiptapReadOnly({ content, className = '' }: TiptapReadOnlyProps)
 
   if (!editor) {
     return (
-      <div className={`rounded-md border border-transparent min-h-[4rem] ${className}`}>
+      <div className={`min-h-[4rem] ${className} ${loadingClassName}`.trim()}>
         <span className="text-muted-foreground text-sm">Loading...</span>
       </div>
     )
   }
 
   return (
-    <div className={`tiptap-editor tiptap-readonly-wrap rounded-md border border-border ${className}`}>
+    <div
+      className={`tiptap-editor tiptap-readonly-wrap ${
+        bordered ? 'rounded-md border border-border' : ''
+      } ${className}`.trim()}
+    >
       <EditorContent editor={editor} />
     </div>
   )

@@ -1,5 +1,6 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 
+import { collectMediaIdsFromPost, deleteUnreferencedMediaByIds } from '@/media/orphanCleanup'
 import { recalculateUsedBytesForUser } from '@/quota/postQuota'
 
 type RelationValue =
@@ -55,12 +56,27 @@ export const syncUserPostQuotaAfterChange: CollectionAfterChangeHook = async ({
     req,
   })
 
+  const detachedMediaIds = collectMediaIdsFromPost(previousDoc as AuthorAwareDoc & { content?: unknown; coverImage?: RelationValue })
+    .filter((mediaId) => !new Set(collectMediaIdsFromPost(doc as AuthorAwareDoc & { content?: unknown; coverImage?: RelationValue })).has(mediaId))
+
+  await deleteUnreferencedMediaByIds({
+    mediaIds: detachedMediaIds,
+    payload: req.payload,
+    req,
+  })
+
   return doc
 }
 
 export const syncUserPostQuotaAfterDelete: CollectionAfterDeleteHook = async ({ doc, req }) => {
   await syncAuthors({
     currentAuthor: (doc as AuthorAwareDoc | null)?.author,
+    req,
+  })
+
+  await deleteUnreferencedMediaByIds({
+    mediaIds: collectMediaIdsFromPost(doc as AuthorAwareDoc & { content?: unknown; coverImage?: RelationValue }),
+    payload: req.payload,
     req,
   })
 

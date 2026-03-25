@@ -5,6 +5,7 @@ import { IconCalendarEvent, IconClockHour4, IconUser } from '@tabler/icons-react
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { CardSpotlight } from '@/components/ui/card-spotlight'
+import { getMediaImageAlt } from '../lib/mediaAlt'
 
 type PostCardProps = {
   title: string
@@ -94,7 +95,7 @@ export default function PostCard({
             <div className={`relative w-full ${aspectClass} max-h-56 overflow-hidden sm:max-h-60`}>
               {hasImage ? (
                 <Image
-                  alt={coverImageAlt || title}
+                  alt={getMediaImageAlt(coverImageAlt, 'cover-image')}
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                   src={coverImageUrl!}
                   fill

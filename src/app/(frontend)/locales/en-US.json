@@ -10,8 +10,10 @@
     "userCenter": "User Center",
     "logout": "Logout",
     "logoutPending": "Signing out...",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
     "languageLabel": "Language",
-    "languageZh": "简体中文",
+    "languageZh": "中文",
     "languageEn": "English",
     "anonymous": "Anonymous"
   },

@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import { cookies as getCookies } from 'next/headers.js'
 import { headers as getHeaders } from 'next/headers.js'
 import { notFound } from 'next/navigation'
 import { IconChevronRight, IconClockHour4, IconMapPin, IconSchool } from '@tabler/icons-react'
+import type { JSONContent } from '@tiptap/core'
 
 import type { Post } from '@/payload-types'
+import { TiptapReadOnly } from '@/components/editor/TiptapReadOnly'
 import PostBackButton from '@/components/PostBackButton'
 import PostFeed from '@/components/PostFeed'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -22,14 +23,12 @@ import {
 import {
   estimatePostReadingMinutes,
   getPostAuthor,
-  getPostCoverImage,
   getPostPreviewText,
   getPostPrimaryTag,
   getPostPublishedLabel,
   getPostSchool,
   getPostSubChannel,
 } from '../../lib/postPresentation'
-import { renderTiptapHtml } from '../../lib/tiptap-render'
 
 function dedupePosts(posts: Post[]): Post[] {
   const seen = new Set<number>()
@@ -106,16 +105,18 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
   const school = getPostSchool(post)
   const channel = getPostSubChannel(post)
   const author = getPostAuthor(post)
-  const coverImage = getPostCoverImage(post)
   const primaryTag = getPostPrimaryTag(post)
   const publishedLabel = getPostPublishedLabel(post.publishedAt ?? post.createdAt, locale)
   const readingMinutes = estimatePostReadingMinutes(post)
-  const articleHtml = renderTiptapHtml(post.content)
   const backHref = channel
     ? `/school/${school?.slug}/channel/${channel.slug}`
     : school
       ? `/school/${school.slug}`
       : '/'
+  const articleContent =
+    post.content && typeof post.content === 'object' && !Array.isArray(post.content)
+      ? (post.content as JSONContent)
+      : undefined
 
   return (
     <article className="px-6 py-8 lg:px-10">
@@ -220,25 +221,13 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
               </div>
             </header>
 
-            {coverImage?.url ? (
-              <div className="overflow-hidden rounded-[2rem] border border-campus-primary/10 bg-white shadow-[0_18px_60px_rgba(13,59,102,0.08)]">
-                <Image
-                  src={coverImage.url}
-                  alt={coverImage.alt || post.title}
-                  width={1600}
-                  height={900}
-                  unoptimized
-                  className="h-auto max-h-[36rem] w-full object-cover"
-                />
-              </div>
-            ) : null}
-
             <section className="rounded-[2rem] border border-campus-primary/10 bg-white/80 p-6 shadow-[0_18px_60px_rgba(13,59,102,0.06)] backdrop-blur-sm sm:p-8">
-              <div
-                className="article-prose"
-                dangerouslySetInnerHTML={{
-                  __html: articleHtml,
-                }}
+              <TiptapReadOnly
+                content={articleContent}
+                bordered={false}
+                className="min-h-[8rem]"
+                contentClassName="article-prose tiptap-readonly"
+                loadingClassName="article-prose"
               />
             </section>
           </div>

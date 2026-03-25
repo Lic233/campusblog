@@ -25,7 +25,7 @@ type PostQuotaInput = {
   title?: string | null
 }
 
-type PublishedPostDoc = PostQuotaInput & {
+type CountedPostDoc = PostQuotaInput & {
   id: number | string
 }
 
@@ -157,15 +157,15 @@ function getPostUsageBytesFromMap(post: PostQuotaInput, mediaSizeMap: Map<number
   return textBytes + getUtf8Length(post.title) + getUtf8Length(post.excerpt) + mediaBytes
 }
 
-async function getPublishedPostsForUser(
+async function getCountedPostsForUser(
   payload: Payload,
   userId: number | string,
   options?: {
     excludePostId?: number | string | null
     req?: PayloadRequest
   },
-): Promise<PublishedPostDoc[]> {
-  const docs: PublishedPostDoc[] = []
+): Promise<CountedPostDoc[]> {
+  const docs: CountedPostDoc[] = []
   let page = 1
 
   while (true) {
@@ -184,11 +184,6 @@ async function getPublishedPostsForUser(
               equals: userId,
             },
           },
-          {
-            status: {
-              equals: 'published',
-            },
-          },
           ...(options?.excludePostId
             ? [
                 {
@@ -202,7 +197,7 @@ async function getPublishedPostsForUser(
       },
     })
 
-    docs.push(...(result.docs as PublishedPostDoc[]))
+    docs.push(...(result.docs as CountedPostDoc[]))
 
     if (page >= result.totalPages) break
     page += 1
@@ -211,7 +206,7 @@ async function getPublishedPostsForUser(
   return docs
 }
 
-export async function projectQuotaForPublishedPost(args: {
+export async function projectQuotaForPost(args: {
   candidatePost: PostQuotaInput
   excludePostId?: number | string | null
   payload: Payload
@@ -219,34 +214,57 @@ export async function projectQuotaForPublishedPost(args: {
   req?: PayloadRequest
   userId: number | string
 }): Promise<QuotaProjection> {
-  const publishedPosts = await getPublishedPostsForUser(args.payload, args.userId, {
+  const countedPosts = await getCountedPostsForUser(args.payload, args.userId, {
     excludePostId: args.excludePostId,
     req: args.req,
   })
 
   const mediaIds = new Set<number>(collectPostMediaIds(args.candidatePost))
-  for (const post of publishedPosts) {
+  for (const post of countedPosts) {
     for (const mediaId of collectPostMediaIds(post)) {
       mediaIds.add(mediaId)
     }
   }
 
   const mediaSizeMap = await getMediaSizeMap(args.payload, Array.from(mediaIds), args.req)
-  const publishedBytes = publishedPosts.reduce(
+  const existingBytes = countedPosts.reduce(
     (total, post) => total + getPostUsageBytesFromMap(post, mediaSizeMap),
     0,
   )
   const requiredBytes = getPostUsageBytesFromMap(args.candidatePost, mediaSizeMap)
-  const usedBytes = publishedBytes + requiredBytes
+  const usedBytes = existingBytes + requiredBytes
   const quotaBytes = args.quotaBytes ?? DEFAULT_QUOTA_BYTES
 
   return {
     allowed: usedBytes <= quotaBytes,
     quotaBytes,
-    remainingBytes: Math.max(quotaBytes - publishedBytes, 0),
+    remainingBytes: Math.max(quotaBytes - existingBytes, 0),
     requiredBytes,
     usedBytes,
   }
+}
+
+export async function getPostUsageBytesMap(args: {
+  payload: Payload
+  posts: (PostQuotaInput & { id: number | string })[]
+  req?: PayloadRequest
+}): Promise<Map<string, number>> {
+  const mediaIds = new Set<number>()
+
+  for (const post of args.posts) {
+    for (const mediaId of collectPostMediaIds(post)) {
+      mediaIds.add(mediaId)
+    }
+  }
+
+  const mediaSizeMap = await getMediaSizeMap(args.payload, Array.from(mediaIds), args.req)
+  const usageMap = new Map<string, number>()
+
+  for (const post of args.posts) {
+    usageMap.set(String(post.id), getPostUsageBytesFromMap(post, mediaSizeMap))
+  }
+
+  return usageMap
 }
 
 export async function recalculateUsedBytesForUser(args: {
@@ -254,17 +272,17 @@ export async function recalculateUsedBytesForUser(args: {
   req: PayloadRequest
   userId: number | string
 }): Promise<number> {
-  const publishedPosts = await getPublishedPostsForUser(args.payload, args.userId, { req: args.req })
+  const countedPosts = await getCountedPostsForUser(args.payload, args.userId, { req: args.req })
   const mediaIds = new Set<number>()
 
-  for (const post of publishedPosts) {
+  for (const post of countedPosts) {
     for (const mediaId of collectPostMediaIds(post)) {
       mediaIds.add(mediaId)
     }
   }
 
   const mediaSizeMap = await getMediaSizeMap(args.payload, Array.from(mediaIds), args.req)
-  const usedBytes = publishedPosts.reduce(
+  const usedBytes = countedPosts.reduce(
     (total, post) => total + getPostUsageBytesFromMap(post, mediaSizeMap),
     0,
   )
