@@ -37,7 +37,7 @@ export default function UserPostActions({
     setIsDeleting(true)
 
     try {
-      const response = await fetch(`/api/posts/${encodeURIComponent(String(postId))}`, {
+      const response = await fetch(`/api/editor/posts/${encodeURIComponent(String(postId))}`, {
         method: 'DELETE',
       })
       const payload = (await response.json().catch((): null => null)) as { error?: string } | null

@@ -1,11 +1,10 @@
-import { getPayload } from 'payload'
 import { revalidateTag } from 'next/cache'
 import { after } from 'next/server'
-import config from '@payload-config'
 
 import { getDictionary } from '@/app/(frontend)/lib/i18n/dictionaries'
 import { resolveRequestLocale } from '@/app/(frontend)/lib/i18n/locale'
-import { projectQuotaForPublishedPost } from '@/quota/postQuota'
+import { PayloadRESTError, createPayloadRESTClient } from '@/lib/payloadREST'
+import { projectQuotaForPublishedPostREST } from '@/quota/postQuotaREST'
 
 export const runtime = 'nodejs'
 export const maxDuration = 15
@@ -21,6 +20,17 @@ type PostRequestBody = {
   status?: 'draft' | 'published'
 }
 
+type UserDoc = {
+  id: number | string
+  quotaBytes?: number | null
+}
+
+type PostDoc = {
+  id: number | string
+  slug: string
+  status: string
+}
+
 const EMPTY_TIPTAP_DOC = {
   type: 'doc',
   content: [
@@ -30,7 +40,7 @@ const EMPTY_TIPTAP_DOC = {
   ],
 }
 
-function toNumericId(value: string | number | undefined | null): number | undefined {
+function toNumericId(value: string | number | undefined): number | undefined {
   if (value === undefined || value === null || value === '') return undefined
   const num = Number(value)
   return Number.isFinite(num) ? num : undefined
@@ -47,22 +57,12 @@ function formatBytes(value: number, locale: string): string {
   return `${formatter.format(value)} B`
 }
 
-export async function PATCH(
-  request: Request,
-  context: { params: Promise<{ id: string }> },
-) {
+export async function POST(request: Request) {
   try {
     const locale = resolveRequestLocale({
       acceptLanguage: request.headers.get('accept-language'),
     })
     const t = getDictionary(locale)
-    const { id } = await context.params
-    const postId = toNumericId(id)
-
-    if (!postId) {
-      return Response.json({ error: t.post.notFoundTitle }, { status: 400 })
-    }
-
     const body = (await request.json()) as PostRequestBody
     const { title, content, school, subChannel, tags, excerpt, coverImage, status } = body
     const nextStatus = status === 'draft' ? 'draft' : 'published'
@@ -77,34 +77,14 @@ export async function PATCH(
       return Response.json({ error: t.editor.schoolRequired }, { status: 400 })
     }
 
-    const payload = await getPayload({ config })
-    const { user } = await payload.auth({ headers: request.headers })
+    const payload = createPayloadRESTClient(request)
+    const authUser = await payload.auth<{ id: number | string }>()
 
-    if (!user) {
+    if (!authUser) {
       return Response.json({ error: t.editor.authRequired }, { status: 401 })
     }
 
-    const [currentUser, existingPost] = await Promise.all([
-      payload.findByID({
-        collection: 'users',
-        depth: 0,
-        id: user.id,
-        overrideAccess: false,
-        user,
-      }),
-      payload.findByID({
-        collection: 'posts',
-        depth: 0,
-        id: postId,
-        overrideAccess: false,
-        user,
-      }),
-    ])
-
-    const schoolId = toNumericId(school)
-    if (!schoolId) {
-      return Response.json({ error: t.editor.schoolRequired }, { status: 400 })
-    }
+    const currentUser = await payload.findByID<UserDoc>('users', authUser.id, { depth: 0 })
 
     const normalizedTitle =
       title && typeof title === 'string' && title.trim()
@@ -112,38 +92,39 @@ export async function PATCH(
         : `Untitled Draft ${Date.now().toString(36)}`
     const normalizedContent = content ?? EMPTY_TIPTAP_DOC
 
+    const schoolId = toNumericId(school)
+    if (!schoolId) {
+      return Response.json({ error: t.editor.schoolRequired }, { status: 400 })
+    }
+
     const data: Record<string, unknown> = {
       title: normalizedTitle,
       content: normalizedContent,
       school: schoolId,
       status: nextStatus,
-      excerpt: excerpt?.trim() || null,
-      subChannel: null,
     }
 
     const subChannelId = toNumericId(subChannel)
     if (subChannelId) data.subChannel = subChannelId
 
-    const coverImageId = toNumericId(coverImage)
-    if (coverImage !== undefined) {
-      data.coverImage = coverImageId ?? null
+    if (excerpt) data.excerpt = excerpt
+
+    const coverImageId = toNumericId(coverImage ?? undefined)
+    data.coverImage = coverImageId ?? null
+
+    if (tags && Array.isArray(tags) && tags.length > 0) {
+      data.tags = tags.map((tag) => toNumericId(tag)).filter(Boolean)
     }
 
-    data.tags =
-      tags && Array.isArray(tags) && tags.length > 0
-        ? tags.map((tag) => toNumericId(tag)).filter(Boolean)
-        : []
-
     if (nextStatus === 'published') {
-      const projection = await projectQuotaForPublishedPost({
+      const projection = await projectQuotaForPublishedPostREST({
         candidatePost: {
           content: normalizedContent,
-          coverImage: coverImageId ?? existingPost.coverImage ?? null,
+          coverImage: coverImageId ?? null,
           excerpt: excerpt?.trim() || null,
           title: normalizedTitle,
         },
-        excludePostId: postId,
-        payload,
+        client: payload,
         quotaBytes: currentUser.quotaBytes,
         userId: currentUser.id,
       })
@@ -159,14 +140,7 @@ export async function PATCH(
       }
     }
 
-    const post = await payload.update({
-      collection: 'posts',
-      id: postId,
-      overrideAccess: false,
-      user,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      data: data as any,
-    })
+    const post = await payload.create<PostDoc>('posts', data)
 
     revalidateTag('posts', 'max')
     revalidateTag('posts-by-school', 'max')
@@ -175,7 +149,7 @@ export async function PATCH(
     after(() => {
       const channelInfo = subChannelId ? ` channel=${subChannelId}` : ''
       console.info(
-        `[posts:update] id=${post.id} slug=${post.slug} school=${schoolId}${channelInfo} status=${nextStatus}`,
+        `[editor-posts:create] id=${post.id} slug=${post.slug} school=${schoolId}${channelInfo}`,
       )
     })
 
@@ -184,54 +158,9 @@ export async function PATCH(
       post: { id: post.id, slug: post.slug, status: post.status },
     })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    console.error('PATCH /api/posts/[id] error:', message)
-    return Response.json({ error: message }, { status: 500 })
-  }
-}
-
-export async function DELETE(
-  request: Request,
-  context: { params: Promise<{ id: string }> },
-) {
-  try {
-    const locale = resolveRequestLocale({
-      acceptLanguage: request.headers.get('accept-language'),
-    })
-    const t = getDictionary(locale)
-    const { id } = await context.params
-    const postId = toNumericId(id)
-
-    if (!postId) {
-      return Response.json({ error: t.post.notFoundTitle }, { status: 400 })
-    }
-
-    const payload = await getPayload({ config })
-    const { user } = await payload.auth({ headers: request.headers })
-
-    if (!user) {
-      return Response.json({ error: t.editor.authRequired }, { status: 401 })
-    }
-
-    const post = await payload.delete({
-      collection: 'posts',
-      id: postId,
-      overrideAccess: false,
-      user,
-    })
-
-    revalidateTag('posts', 'max')
-    revalidateTag('posts-by-school', 'max')
-    revalidateTag('posts-by-school-channel', 'max')
-
-    after(() => {
-      console.info(`[posts:delete] id=${post.id} slug=${post.slug}`)
-    })
-
-    return Response.json({ success: true })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    console.error('DELETE /api/posts/[id] error:', message)
+    const message =
+      err instanceof PayloadRESTError ? err.message : err instanceof Error ? err.message : 'Unknown error'
+    console.error('POST /api/editor/posts error:', message)
     return Response.json({ error: message }, { status: 500 })
   }
 }

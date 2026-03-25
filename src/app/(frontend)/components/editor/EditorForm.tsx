@@ -226,11 +226,14 @@ export default function EditorForm({
       if (selectedTags.length > 0) body.tags = selectedTags
       body.coverImage = coverImage?.id ?? null
 
-      const response = await fetch(initialPost ? `/api/posts/${initialPost.id}` : '/api/posts', {
+      const response = await fetch(
+        initialPost ? `/api/editor/posts/${initialPost.id}` : '/api/editor/posts',
+        {
         method: initialPost ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
-      })
+        },
+      )
 
       const data = (await response.json()) as {
         error?: string
