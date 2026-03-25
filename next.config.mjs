@@ -10,7 +10,14 @@ const __dirname = path.dirname(__filename)
 const nextConfig = {
   // Packages with Cloudflare Workers (workerd) specific code
   // Read more: https://opennext.js.org/cloudflare/howtos/workerd
-  serverExternalPackages: ['jose', 'pg-cloudflare'],
+  serverExternalPackages: [
+    'jose',
+    'pg-cloudflare',
+    '@payloadcms/db-d1-sqlite',
+    '@payloadcms/drizzle',
+    'drizzle-kit',
+    'drizzle-orm',
+  ],
 
   // Your Next.js config here
   webpack: (webpackConfig) => {
