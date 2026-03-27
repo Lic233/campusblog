@@ -177,15 +177,22 @@ export default function PostCard({
                   {authorName || anonymousLabel}
                 </span>
               </div>
-              <div className={cn('font-label text-[12px] text-foreground/50', isDiscoverFeatured ? 'flex flex-wrap items-center gap-x-3 gap-y-1' : 'flex flex-col items-end gap-1')}>
+              <div
+                data-testid="post-card-meta"
+                className={cn(
+                  'font-label text-[12px] text-foreground/50 text-right',
+                  isDiscoverFeatured
+                    ? 'flex flex-wrap justify-end gap-x-3 gap-y-1 sm:max-w-[12rem]'
+                    : 'flex flex-col items-end gap-1',
+                )}>
                 {publishedLabel ? (
-                  <span className="inline-flex items-center gap-1">
+                  <span className="inline-flex items-center justify-end gap-1">
                     <IconCalendarEvent size={14} />
                     {publishedLabel}
                   </span>
                 ) : null}
                 {readingMinutes ? (
-                  <span className="inline-flex items-center gap-1">
+                  <span className="inline-flex items-center justify-end gap-1">
                     <IconClockHour4 size={14} />
                     {readingMinutes} {readTimeLabel}
                   </span>

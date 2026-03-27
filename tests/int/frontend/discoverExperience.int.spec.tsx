@@ -50,7 +50,6 @@ describe('DiscoverExperience', () => {
       <DiscoverExperience
         data={data}
         locale="en-US"
-        searchPlaceholder={dictionary.common.searchPlaceholder}
         copy={dictionary.discoverHome}
       />,
     )
@@ -63,23 +62,31 @@ describe('DiscoverExperience', () => {
     expect(screen.getByText(dictionary.discoverHome.empty.filteredTitle)).toBeTruthy()
   })
 
-  it('keeps the sticky search bar and meta rail aligned below the floating tools', () => {
+  it('keeps the sticky tabs below the top search bar while the meta rail stays below the tools', () => {
     const { container } = render(
       <DiscoverExperience
         data={data}
         locale="en-US"
-        searchPlaceholder={dictionary.common.searchPlaceholder}
         copy={dictionary.discoverHome}
       />,
     )
 
-    const searchSticky = container.querySelector('[data-testid="discover-search-sticky"]')
+    const tabsSticky = container.querySelector('[data-testid="discover-tabs-sticky"]')
+    const tabs = container.querySelector('[data-testid="discover-tabs"]')
     const metaRail = container.querySelector('[data-testid="discover-meta-rail"]')
+    const metaRailScroll = container.querySelector('[data-testid="discover-meta-rail-scroll"]')
 
-    expect(searchSticky).toBeTruthy()
+    expect(tabsSticky).toBeTruthy()
+    expect(tabs).toBeTruthy()
     expect(metaRail).toBeTruthy()
-    expect(searchSticky?.className).toContain('top-[var(--discover-sticky-top)]')
+    expect(metaRailScroll).toBeTruthy()
+    expect(tabsSticky?.className).toContain('top-[var(--discover-sticky-top)]')
+    expect(tabsSticky?.className).toContain('w-fit')
+    expect(tabsSticky?.className).toContain('max-w-full')
+    expect(tabsSticky?.textContent).toContain(dictionary.discoverHome.tabs.recommended)
     expect(metaRail?.className).toContain('xl:top-[var(--discover-sticky-top)]')
-    expect(metaRail?.className).toContain('xl:max-h-[calc(100vh-var(--discover-sticky-top))]')
+    expect(metaRail?.className).not.toContain('xl:overflow-y-auto')
+    expect(metaRailScroll?.className).toContain('xl:max-h-[calc(100vh-var(--discover-sticky-top))]')
+    expect(metaRailScroll?.className).toContain('xl:overflow-y-auto')
   })
 })

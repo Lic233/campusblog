@@ -12,7 +12,7 @@ type DiscoverTabsProps = {
 
 export default function DiscoverTabs({ activeKey, views, onChange, ariaLabel }: DiscoverTabsProps) {
   return (
-    <div role="tablist" aria-label={ariaLabel} className="flex flex-wrap gap-2">
+    <div data-testid="discover-tabs" role="tablist" aria-label={ariaLabel} className="flex flex-wrap gap-2">
       {views.map((view) => {
         const isActive = view.key === activeKey
 

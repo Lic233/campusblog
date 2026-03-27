@@ -70,8 +70,30 @@ describe('PostFeed discover mode', () => {
       />,
     )
 
+    expect(container.querySelector('[data-testid="discover-post-feed"]')?.className).toContain('masonry-grid--discover')
     expect(container.querySelectorAll('[data-card-variant="discover-featured"]').length).toBe(2)
     expect(container.querySelectorAll('[data-card-variant="discover-default"]').length).toBe(1)
+  })
+
+  it('keeps discover card metadata right-aligned', () => {
+    const { container } = render(
+      <PostFeed
+        posts={[makePost(1), makePost(2), makePost(3)]}
+        locale="en-US"
+        showSchoolName
+        showChannelName
+        variant="discover"
+        featuredCount={2}
+      />,
+    )
+
+    const featuredMeta = container.querySelector('[data-card-variant="discover-featured"] [data-testid="post-card-meta"]')
+    const defaultMeta = container.querySelector('[data-card-variant="discover-default"] [data-testid="post-card-meta"]')
+
+    expect(featuredMeta?.className).toContain('justify-end')
+    expect(featuredMeta?.className).toContain('text-right')
+    expect(defaultMeta?.className).toContain('items-end')
+    expect(defaultMeta?.className).toContain('text-right')
   })
 
   it('does not render preview text again in the lower content area for discover cards', () => {

@@ -60,11 +60,21 @@ const post = {
 
 describe('DiscoverHomepage', () => {
   it('renders the hero, search, tabs, and metadata rail together', () => {
-    render(<DiscoverHomepage posts={[post]} locale="en-US" t={dictionary} />)
+    const { container } = render(<DiscoverHomepage posts={[post]} locale="en-US" t={dictionary} />)
 
     expect(screen.getByText(dictionary.discoverHome.heroTitle)).toBeTruthy()
     expect(screen.getByPlaceholderText(dictionary.common.searchPlaceholder)).toBeTruthy()
     expect(screen.getByRole('tab', { name: dictionary.discoverHome.tabs.recommended })).toBeTruthy()
     expect(screen.getByText(dictionary.discoverHome.sections.schoolHighlights)).toBeTruthy()
+    expect(container.querySelector('[data-testid="discover-homepage-shell"]')?.className).toContain(
+      'pt-[var(--floating-toolbar-top)]',
+    )
+    expect(container.querySelector('[data-testid="discover-homepage-content"]')?.className).toContain('w-full')
+    expect(container.querySelector('[data-testid="discover-top-search-sticky"]')?.className).toContain(
+      'top-[var(--floating-toolbar-top)]',
+    )
+    expect(container.querySelector('[data-testid="discover-top-search-sticky"]')?.className).toContain(
+      'justify-center',
+    )
   })
 })

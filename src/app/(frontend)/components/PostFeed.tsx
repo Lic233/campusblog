@@ -49,7 +49,10 @@ export default function PostFeed({
   const t = getDictionary(locale)
 
   return (
-    <div className="masonry-grid">
+    <div
+      data-testid={variant === 'discover' ? 'discover-post-feed' : undefined}
+      className={variant === 'discover' ? 'masonry-grid masonry-grid--discover' : 'masonry-grid'}
+    >
       {posts.map((post, index) => {
         const coverImage = getPostCoverImage(post)
         const primaryTag = getPostPrimaryTag(post)
