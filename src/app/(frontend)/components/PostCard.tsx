@@ -163,11 +163,6 @@ export default function PostCard({
               >
                 {title}
               </h3>
-              {isDiscover ? (
-                <p className={cn('text-foreground/62', isDiscoverFeatured ? 'line-clamp-3 text-sm leading-7' : 'line-clamp-2 text-[13px] leading-6')}>
-                  {previewText}
-                </p>
-              ) : null}
             </div>
 
             <div className={cn('flex gap-3', isDiscoverFeatured ? 'flex-col sm:flex-row sm:items-end sm:justify-between' : 'items-center justify-between')}>

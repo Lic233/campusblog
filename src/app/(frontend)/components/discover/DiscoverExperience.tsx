@@ -30,7 +30,7 @@ export default function DiscoverExperience({
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_18rem]">
       <div className="space-y-4">
-        <div className="sticky top-4 z-20">
+        <div data-testid="discover-search-sticky" className="sticky top-[var(--discover-sticky-top)] z-20">
           <SearchBar
             placeholder={searchPlaceholder}
             className="max-w-none"

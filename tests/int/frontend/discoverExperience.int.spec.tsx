@@ -62,4 +62,24 @@ describe('DiscoverExperience', () => {
     expect(screen.getByText(dictionary.discoverHome.views.latestTitle)).toBeTruthy()
     expect(screen.getByText(dictionary.discoverHome.empty.filteredTitle)).toBeTruthy()
   })
+
+  it('keeps the sticky search bar and meta rail aligned below the floating tools', () => {
+    const { container } = render(
+      <DiscoverExperience
+        data={data}
+        locale="en-US"
+        searchPlaceholder={dictionary.common.searchPlaceholder}
+        copy={dictionary.discoverHome}
+      />,
+    )
+
+    const searchSticky = container.querySelector('[data-testid="discover-search-sticky"]')
+    const metaRail = container.querySelector('[data-testid="discover-meta-rail"]')
+
+    expect(searchSticky).toBeTruthy()
+    expect(metaRail).toBeTruthy()
+    expect(searchSticky?.className).toContain('top-[var(--discover-sticky-top)]')
+    expect(metaRail?.className).toContain('xl:top-[var(--discover-sticky-top)]')
+    expect(metaRail?.className).toContain('xl:max-h-[calc(100vh-var(--discover-sticky-top))]')
+  })
 })

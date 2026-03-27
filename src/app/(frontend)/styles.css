@@ -15,6 +15,9 @@
 
 :root {
   --font-mono: 'Roboto Mono', monospace;
+  --floating-toolbar-top: 1rem;
+  --floating-toolbar-height: 2.25rem;
+  --discover-sticky-top: calc(var(--floating-toolbar-top) + var(--floating-toolbar-height) + 0.75rem);
 }
 
 * {

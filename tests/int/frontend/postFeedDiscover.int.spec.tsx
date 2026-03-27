@@ -73,4 +73,19 @@ describe('PostFeed discover mode', () => {
     expect(container.querySelectorAll('[data-card-variant="discover-featured"]').length).toBe(2)
     expect(container.querySelectorAll('[data-card-variant="discover-default"]').length).toBe(1)
   })
+
+  it('does not render preview text again in the lower content area for discover cards', () => {
+    const { container } = render(
+      <PostFeed
+        posts={[makePost(1)]}
+        locale="en-US"
+        showSchoolName
+        showChannelName
+        variant="discover"
+        featuredCount={1}
+      />,
+    )
+
+    expect(container.querySelectorAll('[data-card-variant="discover-featured"] .space-y-2 > p').length).toBe(0)
+  })
 })
