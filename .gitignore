@@ -19,6 +19,13 @@ pnpm-lock.yaml
 # testing
 /coverage
 
+**.log
+**.pyc
+
+**/server-info
+
+**.html
+
 # next.js
 /.next/
 /out/
