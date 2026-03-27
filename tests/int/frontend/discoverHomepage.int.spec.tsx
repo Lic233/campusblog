@@ -1,4 +1,4 @@
-﻿import { render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import DiscoverHomepage from '@/components/discover/DiscoverHomepage'
@@ -70,10 +70,10 @@ describe('DiscoverHomepage', () => {
       'pt-[var(--floating-toolbar-top)]',
     )
     expect(container.querySelector('[data-testid="discover-homepage-content"]')?.className).toContain('w-full')
-    expect(container.querySelector('[data-testid="discover-top-search-sticky"]')?.className).toContain(
-      'top-[var(--floating-toolbar-top)]',
+    expect(container.querySelector('[data-testid="discover-top-search-shell"]')?.className).toContain(
+      'xl:grid-cols-[minmax(0,1fr)_15rem]',
     )
-    expect(container.querySelector('[data-testid="discover-top-search-sticky"]')?.className).toContain(
+    expect(container.querySelector('[data-testid="discover-top-search-slot"]')?.className).toContain(
       'justify-center',
     )
   })

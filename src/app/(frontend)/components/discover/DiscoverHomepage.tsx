@@ -1,4 +1,4 @@
-﻿import type { AppLocale } from '@/app/(frontend)/lib/i18n/config'
+import type { AppLocale } from '@/app/(frontend)/lib/i18n/config'
 import type { FrontendDictionary } from '@/app/(frontend)/lib/i18n/dictionaries'
 import { buildDiscoverHomeData } from '@/app/(frontend)/lib/discoverPresentation'
 import type { Post } from '@/payload-types'
@@ -27,14 +27,16 @@ export default function DiscoverHomepage({ posts, locale, t }: DiscoverHomepageP
     >
       <div data-testid="discover-homepage-content" className="w-full space-y-6">
         <div
-          data-testid="discover-top-search-sticky"
-          className="sticky top-[var(--floating-toolbar-top)] z-30 flex justify-center"
+          data-testid="discover-top-search-shell"
+          className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_15rem]"
         >
-          <SearchBar
-            placeholder={t.common.searchPlaceholder}
-            className="mx-auto max-w-[42rem]"
-            inputClassName="h-12 border-campus-primary/12 bg-white/88 text-sm shadow-[0_12px_28px_rgba(24,38,72,0.10)] sm:h-14"
-          />
+          <div data-testid="discover-top-search-slot" className="flex justify-center">
+            <SearchBar
+              placeholder={t.common.searchPlaceholder}
+              className="mx-auto w-full max-w-[34rem]"
+              inputClassName="h-10 border-campus-primary/12 bg-white/88 text-sm shadow-[0_12px_28px_rgba(24,38,72,0.10)] sm:h-11"
+            />
+          </div>
         </div>
 
         <DiscoverHero copy={t.discoverHome} featuredPost={data.featuredPost} />

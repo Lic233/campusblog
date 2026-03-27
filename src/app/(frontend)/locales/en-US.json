@@ -56,7 +56,8 @@
       "filteredTitle": "Nothing matches this view yet",
       "filteredHint": "Try another discovery tab or come back after the next post lands."
     },
-    "tabListLabel": "Homepage discovery views"
+    "tabListLabel": "Homepage discovery views",
+    "backToTop": "Back to top"
   },
   "school": {
     "homepage": "Homepage",

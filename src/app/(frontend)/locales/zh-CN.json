@@ -56,7 +56,8 @@
       "filteredTitle": "这个发现视图里还没有内容",
       "filteredHint": "试试切换其他发现方式，或者等下一篇内容出现。"
     },
-    "tabListLabel": "首页发现视图"
+    "tabListLabel": "首页发现视图",
+    "backToTop": "????"
   },
   "school": {
     "homepage": "主页",
