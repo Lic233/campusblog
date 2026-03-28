@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import type { DiscoverView, DiscoverViewKey } from '@/app/(frontend)/lib/discoverPresentation'
 import { cn } from '@/lib/utils'
@@ -21,15 +21,15 @@ export default function DiscoverTabs({ activeKey, views, onChange, ariaLabel }: 
       data-testid="discover-tabs"
       role="tablist"
       aria-label={ariaLabel}
-      className="relative inline-grid w-fit max-w-full min-w-[min(100%,24rem)] overflow-hidden rounded-full border border-campus-primary/10 bg-white/82 p-1 shadow-[0_10px_24px_rgba(24,38,72,0.08)]"
+      className="relative inline-grid w-fit max-w-full min-w-[min(100%,22rem)] overflow-hidden rounded-full border border-campus-border-soft/80 bg-gradient-to-r from-campus-panel-soft via-campus-panel-strong/75 to-campus-panel-soft p-0.5"
       style={{ gridTemplateColumns: 'repeat(' + views.length + ', minmax(0, 1fr))' }}
     >
       <span
         data-testid="discover-tabs-indicator"
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-1 left-1 top-1 rounded-full bg-campus-primary shadow-[0_10px_24px_rgba(47,109,246,0.22)] transition-transform duration-300 ease-out"
+        className="pointer-events-none absolute bottom-0.5 left-0.5 top-0.5 rounded-full bg-campus-primary transition-transform duration-300 ease-out"
         style={{
-          width: 'calc((100% - 0.5rem) / ' + views.length + ')',
+          width: 'calc((100% - 0.25rem) / ' + views.length + ')',
           transform: 'translateX(calc(' + activeIndex + ' * 100%))',
         }}
       />
@@ -45,8 +45,8 @@ export default function DiscoverTabs({ activeKey, views, onChange, ariaLabel }: 
             aria-selected={isActive}
             onClick={() => onChange(view.key)}
             className={cn(
-              'relative z-10 rounded-full px-4 py-2 font-label text-sm font-semibold text-center transition-colors duration-200',
-              isActive ? 'text-white' : 'text-foreground/65 hover:text-campus-primary',
+              'relative z-10 inline-flex min-w-[6.5rem] items-center justify-center rounded-full px-3.5 py-1.5 font-label text-sm font-semibold text-center transition-colors duration-200',
+              isActive ? 'text-white' : 'text-campus-text-soft hover:text-campus-primary',
             )}
           >
             {view.label}

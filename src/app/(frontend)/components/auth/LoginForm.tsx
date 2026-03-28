@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -97,7 +97,7 @@ export default function LoginForm({
           onChange={(event) => setEmail(event.target.value)}
           placeholder="you@example.com"
           autoComplete="email"
-          className="h-11 rounded-xl bg-white/75"
+          className="h-11 rounded-xl border-campus-border-soft bg-campus-panel"
         />
       </div>
 
@@ -108,7 +108,7 @@ export default function LoginForm({
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           autoComplete="current-password"
-          className="h-11 rounded-xl bg-white/75"
+          className="h-11 rounded-xl border-campus-border-soft bg-campus-panel"
         />
       </div>
 
@@ -120,7 +120,7 @@ export default function LoginForm({
 
       <Button
         type="submit"
-        className="h-11 w-full rounded-xl bg-campus-primary text-white hover:bg-campus-primary/90"
+        className="h-11 w-full rounded-xl bg-gradient-to-r from-campus-primary to-campus-secondary text-white hover:opacity-95"
         disabled={isSubmitting}
       >
         {isSubmitting ? t.auth.loginPending : t.auth.loginButton}

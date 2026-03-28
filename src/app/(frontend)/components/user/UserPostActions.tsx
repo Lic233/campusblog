@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -66,7 +66,7 @@ export default function UserPostActions({
         <Button
           asChild
           variant="outline"
-          className="rounded-xl border-campus-primary/10 bg-white/70 text-campus-primary hover:bg-campus-primary/5"
+          className="h-10 min-w-[9rem] justify-center rounded-full border-campus-border-soft bg-campus-panel text-campus-primary hover:bg-campus-panel-soft"
         >
           <Link href={actionHref}>{actionLabel}</Link>
         </Button>
@@ -75,7 +75,7 @@ export default function UserPostActions({
       <Button
         type="button"
         variant="destructive"
-        className="rounded-xl border border-destructive/40 transition-all duration-200 hover:-translate-y-0.5 hover:border-destructive/60 hover:shadow-[0_10px_24px_rgba(220,38,38,0.18)]"
+        className="h-10 min-w-[9rem] justify-center rounded-full border-2 border-destructive/70 bg-destructive/10 text-destructive shadow-[inset_0_0_0_1px_hsl(var(--destructive)/0.12)] transition-colors duration-200 hover:border-destructive hover:bg-destructive hover:text-white"
         disabled={isDeleting}
         onClick={() => {
           setDeleteError('')
@@ -105,3 +105,8 @@ export default function UserPostActions({
     </div>
   )
 }
+
+
+
+
+

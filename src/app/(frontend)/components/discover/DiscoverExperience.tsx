@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { IconArrowUp } from '@tabler/icons-react'
 import { useState } from 'react'
@@ -27,7 +27,7 @@ export default function DiscoverExperience({ data, locale, copy }: DiscoverExper
         <div className="space-y-4">
           <div
             data-testid="discover-tabs-sticky"
-            className="sticky top-[var(--floating-toolbar-top)] z-20 mx-auto w-fit max-w-full rounded-[1.75rem] bg-[linear-gradient(180deg,rgba(246,247,251,0.96),rgba(246,247,251,0.82))] px-3 py-2 backdrop-blur-sm"
+            className="sticky top-[var(--floating-toolbar-top)] z-20 mx-auto w-fit max-w-full rounded-[1.75rem] px-3 py-2"
           >
             <DiscoverTabs
               activeKey={activeKey}
@@ -47,7 +47,7 @@ export default function DiscoverExperience({ data, locale, copy }: DiscoverExper
               featuredCount={2}
             />
           ) : (
-            <section className="rounded-[1.75rem] border border-dashed border-campus-primary/16 bg-white/68 p-10 text-center shadow-sm">
+            <section className="rounded-[1.75rem] border border-dashed border-campus-primary/16 p-10 text-center shadow-sm">
               <h3 className="font-headline text-2xl text-campus-primary">{copy.empty.filteredTitle}</h3>
               <p className="mt-2 text-sm leading-7 text-foreground/62">{copy.empty.filteredHint}</p>
             </section>
@@ -68,7 +68,7 @@ export default function DiscoverExperience({ data, locale, copy }: DiscoverExper
         aria-label={copy.backToTop}
         title={copy.backToTop}
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className="fixed bottom-6 right-6 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-campus-primary/10 bg-white/92 text-campus-primary shadow-[0_16px_32px_rgba(24,38,72,0.16)] backdrop-blur-sm transition-transform duration-200 hover:-translate-y-0.5 hover:bg-white"
+        className="fixed bottom-6 right-6 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-campus-primary/10 text-campus-primary shadow-[0_16px_32px_rgba(24,38,72,0.16)] transition-transform duration-200 hover:-translate-y-0.5"
       >
         <IconArrowUp size={18} />
       </button>

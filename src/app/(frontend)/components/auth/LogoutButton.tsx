@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -39,7 +39,7 @@ export default function LogoutButton({ label, pendingLabel, className }: LogoutB
       type="button"
       variant="outline"
       className={cn(
-        'h-10 flex-1 rounded-xl border-campus-primary/10 bg-white/70 text-campus-primary hover:bg-campus-primary/5',
+        'h-10 flex-1 rounded-full border-2 border-destructive/70 bg-destructive/10 text-destructive shadow-[inset_0_0_0_1px_hsl(var(--destructive)/0.12)] transition-colors duration-200 hover:border-destructive hover:bg-destructive hover:text-white',
         className,
       )}
       onClick={handleLogout}
@@ -49,3 +49,8 @@ export default function LogoutButton({ label, pendingLabel, className }: LogoutB
     </Button>
   )
 }
+
+
+
+
+

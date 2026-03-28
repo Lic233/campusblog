@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+﻿import type { Metadata } from 'next'
 import Link from 'next/link'
 import { cookies as getCookies } from 'next/headers.js'
 import { headers as getHeaders } from 'next/headers.js'
@@ -119,44 +119,44 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
       : undefined
 
   return (
-    <article className="px-6 py-8 lg:px-10">
-      <div className="mx-auto max-w-6xl space-y-8">
-        <nav className="flex flex-wrap items-center gap-2 text-sm font-label text-foreground/50">
-          <Link href="/" className="transition-colors hover:text-campus-primary">
-            {t.post.discover}
-          </Link>
-          {school ? (
-            <>
-              <IconChevronRight size={14} />
-              <Link
-                href={`/school/${school.slug}`}
-                className="transition-colors hover:text-campus-primary"
-              >
-                {school.name}
-              </Link>
-            </>
-          ) : null}
-          {channel ? (
-            <>
-              <IconChevronRight size={14} />
-              <Link
-                href={`/school/${school?.slug}/channel/${channel.slug}`}
-                className="transition-colors hover:text-campus-primary"
-              >
-                {channel.name}
-              </Link>
-            </>
-          ) : null}
-          <IconChevronRight size={14} />
-          <span className="text-foreground/70">{post.title}</span>
-        </nav>
+    <article className="bg-gradient-to-b from-campus-page via-campus-panel-soft/30 to-campus-page px-4 py-8 sm:px-5 lg:px-6">
+      <div className="space-y-8">
+        <div className="flex flex-col gap-4">
+          <nav className="flex flex-wrap items-center gap-2 text-sm font-label text-campus-text-soft">
+            <Link href="/" className="transition-colors hover:text-campus-primary">
+              {t.post.discover}
+            </Link>
+            {school ? (
+              <>
+                <IconChevronRight size={14} />
+                <Link
+                  href={`/school/${school.slug}`}
+                  className="transition-colors hover:text-campus-primary"
+                >
+                  {school.name}
+                </Link>
+              </>
+            ) : null}
+            {channel ? (
+              <>
+                <IconChevronRight size={14} />
+                <Link
+                  href={`/school/${school?.slug}/channel/${channel.slug}`}
+                  className="transition-colors hover:text-campus-primary"
+                >
+                  {channel.name}
+                </Link>
+              </>
+            ) : null}
+          </nav>
 
-        <PostBackButton fallbackHref={backHref} label={t.post.back} />
+          <PostBackButton fallbackHref={backHref} label={t.post.back} />
+        </div>
 
-        <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_19rem]">
-          <div className="space-y-8">
-            <header className="relative rounded-[2rem] border border-campus-primary/10 bg-[radial-gradient(circle_at_top_left,rgba(54,117,136,0.18),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,255,255,0.74))] p-5 pr-24 shadow-[0_20px_64px_rgba(13,59,102,0.08)] sm:p-6 sm:pr-28">
-              <div className="absolute bottom-5 right-5 flex max-w-[45%] flex-wrap justify-end gap-2 sm:bottom-6 sm:right-6">
+        <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_18rem]">
+          <div className="space-y-6">
+            <header className="rounded-[2rem] border border-campus-border-soft/80 bg-gradient-to-br from-campus-panel via-campus-panel-soft/55 to-campus-page p-6 shadow-[0_18px_44px_rgba(27,75,122,0.05)] sm:p-8">
+              <div className="flex flex-wrap gap-2">
                 {primaryTag ? (
                   <Badge className="bg-campus-primary text-white hover:bg-campus-primary">
                     {primaryTag.name}
@@ -165,7 +165,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
                 {school ? (
                   <Badge
                     variant="secondary"
-                    className="border-campus-primary/10 bg-campus-primary/8 text-campus-primary"
+                    className="border-campus-border-soft bg-campus-panel-strong text-campus-primary"
                   >
                     {school.name}
                   </Badge>
@@ -173,55 +173,59 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
                 {channel ? (
                   <Badge
                     variant="secondary"
-                    className="border-campus-teal/10 bg-campus-teal/10 text-campus-teal"
+                    className="border-campus-border-soft bg-campus-panel-strong text-campus-secondary"
                   >
                     {channel.name}
                   </Badge>
                 ) : null}
               </div>
 
-              <h1 className="font-headline text-4xl font-bold leading-tight text-campus-primary sm:text-5xl">
+              <h1 className="mt-5 font-headline text-4xl leading-tight text-campus-primary sm:text-5xl">
                 {post.title}
               </h1>
 
               {post.excerpt ? (
-                <p className="mt-3 max-w-3xl text-base leading-7 text-foreground/65 sm:text-lg">
+                <p className="mt-4 max-w-3xl text-base leading-8 text-campus-text-soft sm:text-lg">
                   {post.excerpt}
                 </p>
               ) : null}
 
-              <div className="mt-5 flex flex-wrap items-center gap-3 text-sm font-label text-foreground/60">
-                <div className="flex items-center gap-3 rounded-full bg-white/75 px-3 py-2 shadow-sm">
-                  <Avatar className="h-9 w-9 border border-campus-primary/10">
+              <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex items-center gap-3 rounded-[1.5rem] border border-campus-border-soft/80 bg-campus-panel-strong px-4 py-3">
+                  <Avatar className="h-10 w-10 border border-campus-border-soft">
                     {author?.avatar && typeof author.avatar === 'object' ? (
                       <AvatarImage src={author.avatar.url ?? undefined} alt={author.displayName} />
                     ) : null}
-                    <AvatarFallback className="bg-campus-surface-container text-campus-primary">
+                    <AvatarFallback className="bg-campus-panel text-campus-primary">
                       {author?.displayName?.slice(0, 1).toUpperCase() ?? 'A'}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <div className="text-foreground/80">
+                    <div className="font-label text-sm font-semibold text-foreground/80">
                       {author?.displayName ?? t.common.anonymous}
                     </div>
-                    {publishedLabel ? (
-                      <div className="text-xs text-foreground/45">
-                        {t.post.published}: {publishedLabel}
-                      </div>
-                    ) : null}
+                    <div className="text-xs text-campus-text-soft">
+                      {t.post.author}
+                    </div>
                   </div>
                 </div>
 
-                <div className="inline-flex items-center gap-2 rounded-full bg-white/75 px-3 py-2 shadow-sm">
-                  <IconClockHour4 size={16} />
-                  <span>
+                <div className="flex flex-wrap gap-3 font-label text-sm text-campus-text-soft">
+                  {publishedLabel ? (
+                    <span className="inline-flex items-center gap-2 rounded-full border border-campus-border-soft/80 bg-campus-panel-strong px-4 py-2">
+                      <IconMapPin size={16} />
+                      {t.post.published}: {publishedLabel}
+                    </span>
+                  ) : null}
+                  <span className="inline-flex items-center gap-2 rounded-full border border-campus-border-soft/80 bg-campus-panel-strong px-4 py-2">
+                    <IconClockHour4 size={16} />
                     {readingMinutes} {t.post.readTime}
                   </span>
                 </div>
               </div>
             </header>
 
-            <section className="rounded-[2rem] border border-campus-primary/10 bg-white/80 p-6 shadow-[0_18px_60px_rgba(13,59,102,0.06)] backdrop-blur-sm sm:p-8">
+            <section className="rounded-[2rem] border border-campus-border-soft/80 bg-[linear-gradient(180deg,#FFFFFF_0%,#F9FBFE_100%)] p-6 shadow-[0_14px_36px_rgba(27,75,122,0.04)] sm:p-8">
               <TiptapReadOnly
                 content={articleContent}
                 bordered={false}
@@ -233,12 +237,12 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
           </div>
 
           <aside className="space-y-4 xl:sticky xl:top-24 xl:self-start">
-            <section className="rounded-[1.75rem] border border-campus-primary/10 bg-white/80 p-5 shadow-sm backdrop-blur-sm">
-              <div className="text-xs font-label uppercase tracking-[0.18em] text-foreground/40">
+            <section className="rounded-[1.75rem] border border-campus-border-soft/80 bg-gradient-to-br from-campus-panel-soft to-campus-panel-strong p-5 shadow-[0_12px_28px_rgba(27,75,122,0.04)]">
+              <div className="text-xs font-label uppercase tracking-[0.18em] text-campus-text-soft">
                 {t.post.school}
               </div>
               <div className="mt-3 flex items-start gap-3">
-                <div className="rounded-2xl bg-campus-primary/10 p-3 text-campus-primary">
+                <div className="rounded-2xl bg-campus-panel p-3 text-campus-primary">
                   <IconSchool size={20} />
                 </div>
                 <div>
@@ -248,7 +252,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
                   {school ? (
                     <Link
                       href={`/school/${school.slug}`}
-                      className="mt-1 inline-flex items-center gap-1 text-sm text-campus-primary/70 hover:text-campus-primary"
+                      className="mt-1 inline-flex items-center gap-1 text-sm text-campus-text-soft hover:text-campus-primary"
                     >
                       <IconMapPin size={14} />
                       /school/{school.slug}
@@ -259,15 +263,15 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
             </section>
 
             {channel ? (
-              <section className="rounded-[1.75rem] border border-campus-primary/10 bg-white/80 p-5 shadow-sm backdrop-blur-sm">
-                <div className="text-xs font-label uppercase tracking-[0.18em] text-foreground/40">
+              <section className="rounded-[1.75rem] border border-campus-border-soft/80 bg-gradient-to-br from-campus-panel-soft to-campus-page p-5 shadow-[0_12px_28px_rgba(27,75,122,0.04)]">
+                <div className="text-xs font-label uppercase tracking-[0.18em] text-campus-text-soft">
                   {t.post.channel}
                 </div>
                 <div className="mt-3">
                   <div className="font-headline text-xl text-campus-primary">{channel.name}</div>
                   <Link
                     href={`/school/${school?.slug}/channel/${channel.slug}`}
-                    className="mt-2 inline-flex text-sm text-campus-teal hover:text-campus-primary"
+                    className="mt-2 inline-flex text-sm text-campus-secondary hover:text-campus-primary"
                   >
                     /channel/{channel.slug}
                   </Link>
@@ -275,16 +279,16 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
               </section>
             ) : null}
 
-            <section className="rounded-[1.75rem] border border-campus-primary/10 bg-white/80 p-5 shadow-sm backdrop-blur-sm">
-              <div className="text-xs font-label uppercase tracking-[0.18em] text-foreground/40">
+            <section className="rounded-[1.75rem] border border-campus-border-soft/80 bg-gradient-to-br from-campus-panel to-campus-panel-soft/70 p-5 shadow-[0_12px_28px_rgba(27,75,122,0.04)]">
+              <div className="text-xs font-label uppercase tracking-[0.18em] text-campus-text-soft">
                 {t.post.author}
               </div>
               <div className="mt-3 flex items-start gap-3">
-                <Avatar className="h-12 w-12 border border-campus-primary/10">
+                <Avatar className="h-12 w-12 border border-campus-border-soft">
                   {author?.avatar && typeof author.avatar === 'object' ? (
                     <AvatarImage src={author.avatar.url ?? undefined} alt={author.displayName} />
                   ) : null}
-                  <AvatarFallback className="bg-campus-surface-container text-campus-primary">
+                  <AvatarFallback className="bg-campus-panel-strong text-campus-primary">
                     {author?.displayName?.slice(0, 1).toUpperCase() ?? 'A'}
                   </AvatarFallback>
                 </Avatar>
@@ -292,7 +296,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
                   <div className="font-label text-base font-semibold text-foreground/80">
                     {author?.displayName ?? t.common.anonymous}
                   </div>
-                  <p className="text-sm leading-6 text-foreground/60">
+                  <p className="text-sm leading-6 text-campus-text-soft">
                     {author?.bio?.trim() || t.post.authorBioFallback}
                   </p>
                 </div>
@@ -302,7 +306,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
         </div>
 
         {relatedPosts.length > 0 ? (
-          <section className="space-y-4">
+          <section className="space-y-4 rounded-[2rem] border border-campus-border-soft/80 bg-gradient-to-br from-campus-panel-soft via-campus-panel to-campus-page p-5 shadow-[0_14px_32px_rgba(27,75,122,0.04)] sm:p-6">
             <div>
               <h2 className="font-headline text-3xl text-campus-primary">
                 {channel ? t.post.relatedChannel : t.post.relatedSchool}

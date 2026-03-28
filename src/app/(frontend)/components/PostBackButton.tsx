@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -21,9 +21,9 @@ export default function PostBackButton({ fallbackHref, label }: PostBackButtonPr
           router.back()
         }
       }}
-      className="inline-flex items-center gap-2 rounded-full border border-campus-primary/10 bg-white/70 px-4 py-2 text-sm font-label text-campus-primary shadow-sm transition hover:bg-white"
+      className="inline-flex w-fit items-center gap-1.5 rounded-full border border-campus-primary/10 px-3 py-1.5 text-xs font-label font-semibold text-campus-primary transition-colors hover:border-campus-primary/18 hover:bg-campus-panel-soft hover:text-campus-secondary"
     >
-      <IconArrowLeft size={16} />
+      <IconArrowLeft size={14} />
       {label}
     </Link>
   )
