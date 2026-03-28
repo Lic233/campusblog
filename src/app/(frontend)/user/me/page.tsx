@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import { headers as getHeaders } from 'next/headers.js'
 import { cookies as getCookies } from 'next/headers.js'
 import { redirect } from 'next/navigation'
@@ -71,7 +71,7 @@ function UserPostList({
         return (
           <div
             key={post.id}
-            className="rounded-2xl border border-campus-primary/10 bg-white/70 px-4 py-4 shadow-sm"
+            className="rounded-2xl border border-campus-border-soft/80 bg-gradient-to-br from-campus-panel to-campus-panel-soft/70 px-4 py-4"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
@@ -87,7 +87,7 @@ function UserPostList({
                   {school ? (
                     <Badge
                       variant="secondary"
-                      className="border-campus-primary/10 bg-campus-primary/8 text-campus-primary"
+                      className="border-campus-border-soft bg-campus-panel-strong text-campus-primary"
                     >
                       {school.name}
                     </Badge>
@@ -95,7 +95,7 @@ function UserPostList({
                   {channel ? (
                     <Badge
                       variant="secondary"
-                      className="border-campus-teal/10 bg-campus-teal/10 text-campus-teal"
+                      className="border-campus-border-soft bg-campus-panel-strong text-campus-secondary"
                     >
                       {channel.name}
                     </Badge>
@@ -123,8 +123,8 @@ function UserPostList({
               />
             </div>
           </div>
-        )
-      })}
+        )}
+      )}
     </div>
   )
 }
@@ -181,9 +181,9 @@ export default async function UserCenterPage() {
       : undefined
 
   return (
-    <section className="px-6 py-8 lg:px-10">
+    <section className="bg-gradient-to-b from-campus-page via-campus-panel-soft/30 to-campus-page px-6 pb-8 pt-[calc(var(--floating-toolbar-top)+var(--floating-toolbar-height)+1rem)] lg:px-10">
       <div className="mx-auto max-w-6xl space-y-6">
-        <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-wrap items-end justify-between gap-4 rounded-[1.75rem] border border-campus-border-soft/80 bg-gradient-to-br from-campus-panel via-campus-panel-soft/55 to-campus-page p-6 shadow-[0_16px_40px_rgba(13,59,102,0.06)]">
           <div>
             <p className="font-label text-xs uppercase tracking-[0.18em] text-campus-primary/45">
               {t.common.appName}
@@ -199,7 +199,8 @@ export default async function UserCenterPage() {
           <div className="flex flex-wrap gap-3">
             <Button
               asChild
-              className="h-11 min-w-[11rem] flex-1 rounded-xl bg-primary text-primary-foreground shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-[0_12px_28px_rgba(13,59,102,0.18)]"
+              data-testid="write-article-button"
+              className="h-11 min-w-[11rem] flex-1 rounded-full bg-campus-primary px-5 text-white shadow-[0_12px_24px_rgba(13,59,102,0.14)] transition-colors duration-200 hover:bg-campus-secondary"
             >
               <Link href="/editor">{t.userCenter.writeArticle}</Link>
             </Button>
@@ -212,8 +213,8 @@ export default async function UserCenterPage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,0.9fr)]">
-          <Card className="rounded-[1.75rem] border border-campus-primary/10 bg-white/80 py-0 shadow-[0_16px_48px_rgba(13,59,102,0.08)]">
-            <CardHeader className="border-b border-campus-primary/8 py-5">
+          <Card className="rounded-[1.75rem] border border-campus-border-soft/80 bg-gradient-to-br from-campus-panel via-campus-panel-soft/60 to-campus-page py-0 shadow-[0_14px_36px_rgba(13,59,102,0.05)]">
+            <CardHeader className="border-b border-campus-border-soft/70 py-5">
               <CardTitle className="font-headline text-2xl text-campus-primary">
                 {t.userCenter.profileCardTitle}
               </CardTitle>
@@ -241,31 +242,31 @@ export default async function UserCenterPage() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-[1.75rem] border border-campus-primary/10 bg-white/80 py-0 shadow-[0_16px_48px_rgba(13,59,102,0.08)]">
-            <CardHeader className="border-b border-campus-primary/8 py-5">
+          <Card className="rounded-[1.75rem] border border-campus-border-soft/80 bg-gradient-to-br from-campus-panel-soft via-campus-panel-strong to-campus-page py-0 shadow-[0_14px_36px_rgba(13,59,102,0.05)]">
+            <CardHeader className="border-b border-campus-border-soft/70 py-5">
               <CardTitle className="font-headline text-2xl text-campus-primary">
                 {t.userCenter.quotaCardTitle}
               </CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 px-5 py-5">
-              <div className="rounded-2xl bg-campus-primary/6 px-4 py-4">
-                <div className="text-xs font-label uppercase tracking-[0.18em] text-foreground/45">
+              <div className="rounded-2xl border border-campus-primary/18 bg-gradient-to-br from-campus-primary/16 to-campus-primary/7 px-4 py-4">
+                <div className="text-xs font-label uppercase tracking-[0.18em] text-campus-primary/60">
                   {t.userCenter.usedQuota}
                 </div>
                 <div className="mt-2 font-headline text-3xl text-campus-primary">
                   {formatBytes(usedBytes, locale)}
                 </div>
               </div>
-              <div className="rounded-2xl bg-campus-teal/8 px-4 py-4">
-                <div className="text-xs font-label uppercase tracking-[0.18em] text-foreground/45">
+              <div className="rounded-2xl border border-campus-secondary/18 bg-gradient-to-br from-campus-secondary/12 to-campus-secondary/4 px-4 py-4">
+                <div className="text-xs font-label uppercase tracking-[0.18em] text-campus-primary/60">
                   {t.userCenter.totalQuota}
                 </div>
                 <div className="mt-2 font-headline text-3xl text-campus-primary">
                   {formatBytes(quotaBytes, locale)}
                 </div>
               </div>
-              <div className="rounded-2xl bg-campus-accent/8 px-4 py-4">
-                <div className="text-xs font-label uppercase tracking-[0.18em] text-foreground/45">
+              <div className="rounded-2xl border border-campus-accent/22 bg-gradient-to-br from-campus-accent/18 to-campus-accent/6 px-4 py-4">
+                <div className="text-xs font-label uppercase tracking-[0.18em] text-campus-primary/60">
                   {t.userCenter.remainingQuota}
                 </div>
                 <div className="mt-2 font-headline text-3xl text-campus-primary">
@@ -276,8 +277,8 @@ export default async function UserCenterPage() {
           </Card>
         </div>
 
-        <Card className="rounded-[1.75rem] border border-campus-primary/10 bg-white/80 py-0 shadow-[0_16px_48px_rgba(13,59,102,0.08)]">
-          <CardHeader className="border-b border-campus-primary/8 py-5">
+        <Card className="rounded-[1.75rem] border border-campus-border-soft/80 bg-gradient-to-br from-campus-panel-soft via-campus-panel to-campus-page py-0 shadow-[0_14px_36px_rgba(13,59,102,0.05)]">
+          <CardHeader className="border-b border-campus-border-soft/70 py-5">
             <CardTitle className="font-headline text-2xl text-campus-primary">
               {t.userCenter.draftsTitle}
             </CardTitle>
@@ -296,8 +297,8 @@ export default async function UserCenterPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-[1.75rem] border border-campus-primary/10 bg-white/80 py-0 shadow-[0_16px_48px_rgba(13,59,102,0.08)]">
-          <CardHeader className="border-b border-campus-primary/8 py-5">
+        <Card className="rounded-[1.75rem] border border-campus-border-soft/80 bg-gradient-to-br from-campus-panel via-campus-page to-campus-panel-soft/70 py-0 shadow-[0_14px_36px_rgba(13,59,102,0.05)]">
+          <CardHeader className="border-b border-campus-border-soft/70 py-5">
             <CardTitle className="font-headline text-2xl text-campus-primary">
               {t.userCenter.publishedTitle}
             </CardTitle>
@@ -319,3 +320,6 @@ export default async function UserCenterPage() {
     </section>
   )
 }
+
+
+

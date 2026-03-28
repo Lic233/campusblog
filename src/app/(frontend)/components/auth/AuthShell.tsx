@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { IconArrowLeft, IconLock, IconUserPlus } from '@tabler/icons-react'
 
@@ -39,13 +39,13 @@ export default function AuthShell({
 }: AuthShellProps) {
   return (
     <section className="relative flex h-screen items-center justify-center overflow-hidden px-5 py-6 lg:px-8">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(54,117,136,0.18),transparent_32%),radial-gradient(circle_at_20%_20%,rgba(13,59,102,0.14),transparent_28%),linear-gradient(180deg,#f8fbff_0%,#f3f7fc_45%,#eef4fb_100%)]" />
-      <div className="pointer-events-none absolute inset-0 opacity-70 [background-image:linear-gradient(rgba(13,59,102,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(13,59,102,0.08)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:radial-gradient(circle_at_center,black,transparent_88%)]" />
-      <div className="pointer-events-none absolute -left-24 top-24 h-72 w-72 rounded-full bg-campus-teal/20 blur-3xl" />
-      <div className="pointer-events-none absolute -right-10 bottom-8 h-80 w-80 rounded-full bg-campus-primary/15 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(43,122,120,0.16),transparent_30%),radial-gradient(circle_at_18%_18%,rgba(27,75,122,0.14),transparent_24%),linear-gradient(180deg,#f7f9fd_0%,#f2f6fb_42%,#eaf1fa_100%)]" />
+      <div className="pointer-events-none absolute inset-0 opacity-60 [background-image:linear-gradient(rgba(27,75,122,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(27,75,122,0.06)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:radial-gradient(circle_at_center,black,transparent_88%)]" />
+      <div className="pointer-events-none absolute -left-24 top-24 h-72 w-72 rounded-full bg-campus-teal/12 blur-3xl" />
+      <div className="pointer-events-none absolute -right-10 bottom-8 h-80 w-80 rounded-full bg-campus-primary/10 blur-3xl" />
 
       <div className="relative z-10 w-full max-w-lg">
-        <div className="rounded-[1.75rem] border border-white/60 bg-white/72 p-5 shadow-[0_30px_120px_rgba(13,59,102,0.16)] backdrop-blur-2xl sm:p-6">
+        <div className="rounded-[1.75rem] border border-campus-border-soft/80 bg-gradient-to-br from-campus-panel via-campus-panel-soft/60 to-campus-page p-5 shadow-[0_24px_72px_rgba(13,59,102,0.10)] sm:p-6">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0 flex-1">
               <p className="font-label text-xs uppercase tracking-[0.24em] text-campus-primary/45">
@@ -76,7 +76,7 @@ export default function AuthShell({
                 </h1>
               </div>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-campus-primary/10 bg-campus-primary/5 text-campus-primary shadow-sm">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-campus-border-soft/80 bg-campus-panel-strong text-campus-primary">
               <div className="relative h-[22px] w-[22px] overflow-hidden">
                 <IconLock
                   size={22}
@@ -127,17 +127,11 @@ export default function AuthShell({
             </p>
           </div>
 
-          <div className="relative mt-3.5 grid grid-cols-2 rounded-[1.05rem] border border-campus-primary/10 bg-campus-primary/[0.04] p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+          <div className="relative mt-3.5 grid grid-cols-2 rounded-[1.05rem] border border-campus-border-soft/80 bg-campus-panel-soft p-1.5">
             <div
               className={cn(
-                'pointer-events-none absolute bottom-1.5 top-1.5 z-0 w-[calc(50%-0.375rem)] rounded-[0.95rem] bg-white/95 shadow-[0_16px_36px_rgba(13,59,102,0.14)] ring-1 ring-white/70 transition-all duration-500 ease-expressive',
+                'pointer-events-none absolute bottom-1.5 top-1.5 z-0 w-[calc(50%-0.375rem)] rounded-[0.95rem] bg-campus-panel ring-1 ring-campus-border-soft/70 transition-all duration-500 ease-expressive',
                 mode === 'login' ? 'left-1.5' : 'left-[calc(50%+0.125rem)]',
-              )}
-            />
-            <div
-              className={cn(
-                'pointer-events-none absolute bottom-2 z-0 h-8 w-[calc(50%-1rem)] rounded-full bg-campus-primary/10 blur-xl transition-all duration-500 ease-expressive',
-                mode === 'login' ? 'left-3' : 'left-[calc(50%+0.25rem)]',
               )}
             />
             <Link
@@ -192,7 +186,7 @@ export default function AuthShell({
             </Link>
           </div>
 
-          <div className="mt-4 max-h-[min(50vh,28rem)] overflow-y-auto overscroll-contain rounded-[1.35rem] border border-campus-primary/10 bg-white/78 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] sm:max-h-[min(52vh,29rem)] sm:p-5">
+          <div className="mt-4 max-h-[min(50vh,28rem)] overflow-y-auto overscroll-contain rounded-[1.35rem] border border-campus-border-soft/80 bg-[linear-gradient(180deg,#FFFFFF_0%,#F8FBFE_100%)] p-4 sm:max-h-[min(52vh,29rem)] sm:p-5">
             {children}
           </div>
 

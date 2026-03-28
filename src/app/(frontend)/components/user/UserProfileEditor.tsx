@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useMemo, useState } from 'react'
 import { IconCamera, IconLoader2 } from '@tabler/icons-react'
@@ -137,14 +137,14 @@ export default function UserProfileEditor({
     <form className="space-y-5" onSubmit={handleSubmit}>
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
         <div className="flex flex-col items-center gap-3">
-          <Avatar className="h-20 w-20 border border-campus-primary/10">
+          <Avatar className="h-20 w-20 border border-campus-border-soft bg-campus-panel-soft">
             {previewUrl ? <AvatarImage src={previewUrl} alt={nextDisplayName} /> : null}
-            <AvatarFallback className="bg-campus-surface-container text-xl text-campus-primary">
+            <AvatarFallback className="bg-campus-panel-strong text-xl text-campus-primary">
               {nextDisplayName.slice(0, 1).toUpperCase()}
             </AvatarFallback>
           </Avatar>
 
-          <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-campus-primary/10 bg-campus-primary/5 px-3 py-2 text-sm font-label text-campus-primary transition-colors hover:bg-campus-primary/10">
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-campus-border-soft bg-campus-panel-strong px-3 py-2 text-sm font-label text-campus-primary transition-colors hover:bg-campus-panel-soft">
             <IconCamera size={16} />
             {copy.avatarUpload}
             <input
@@ -174,14 +174,14 @@ export default function UserProfileEditor({
                 setNextDisplayName(event.target.value)
                 setSuccess('')
               }}
-              className="h-11 rounded-xl bg-white/75"
+              className="h-11 rounded-xl border-campus-border-soft bg-campus-panel"
               maxLength={80}
             />
           </div>
 
           <div className="space-y-2">
             <Label className="font-label text-sm text-foreground/70">{copy.emailLabel}</Label>
-            <Input value={email} disabled className="h-11 rounded-xl bg-white/55 text-foreground/55" />
+            <Input value={email} disabled className="h-11 rounded-xl border-campus-border-soft bg-campus-panel-soft text-foreground/55" />
           </div>
 
           <div className="space-y-2">
@@ -192,7 +192,7 @@ export default function UserProfileEditor({
                 setNextBio(event.target.value)
                 setSuccess('')
               }}
-              className="min-h-28 rounded-xl bg-white/75 px-3 py-2.5"
+              className="min-h-28 rounded-xl border-campus-border-soft bg-campus-panel px-3 py-2.5"
               placeholder={copy.noBio}
               maxLength={280}
             />
@@ -215,7 +215,8 @@ export default function UserProfileEditor({
       <div className="flex justify-end">
         <Button
           type="submit"
-          className="h-11 rounded-xl bg-primary px-5 text-primary-foreground hover:bg-primary/90"
+          data-testid="save-profile-button"
+          className="h-11 rounded-full bg-campus-primary px-5 text-white shadow-[0_12px_24px_rgba(13,59,102,0.14)] transition-colors duration-200 hover:bg-campus-secondary"
           disabled={isSubmitting}
         >
           {isSubmitting ? <IconLoader2 size={16} className="animate-spin" /> : null}
@@ -225,3 +226,4 @@ export default function UserProfileEditor({
     </form>
   )
 }
+

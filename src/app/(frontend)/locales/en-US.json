@@ -26,6 +26,39 @@
     "noPosts": "No posts to discover yet",
     "noPostsHint": "Be the first to share your insights"
   },
+  "discoverHome": {
+    "heroEyebrow": "Campus now",
+    "heroTitle": "What is everyone talking about on campus today?",
+    "heroSubtitle": "Start with the stories, events, and opinions moving across schools right now.",
+    "featuredLabel": "Featured now",
+    "tabs": {
+      "recommended": "Recommended",
+      "latest": "Latest",
+      "sameSchool": "Same School Trending",
+      "nearbySchools": "Nearby Schools"
+    },
+    "views": {
+      "recommendedTitle": "Recommended for browsing",
+      "recommendedHint": "A balanced mix of active campus stories and standout posts.",
+      "latestTitle": "Latest drops",
+      "latestHint": "Freshly published posts, sorted by newest first.",
+      "sameSchoolTitle": "Same school momentum",
+      "sameSchoolHint": "A tighter stream built around the busiest school in the current feed.",
+      "nearbySchoolsTitle": "Across nearby schools",
+      "nearbySchoolsHint": "Sample one story from more campuses before diving deeper."
+    },
+    "sections": {
+      "schoolHighlights": "School Highlights",
+      "channelShortcuts": "Channel Shortcuts",
+      "trendingTags": "Trending Tags"
+    },
+    "empty": {
+      "filteredTitle": "Nothing matches this view yet",
+      "filteredHint": "Try another discovery tab or come back after the next post lands."
+    },
+    "tabListLabel": "Homepage discovery views",
+    "backToTop": "Back to top"
+  },
   "school": {
     "homepage": "Homepage",
     "allPosts": "All Posts",

@@ -1,15 +1,22 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { IconSearch } from '@tabler/icons-react'
+
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
 type SearchBarProps = {
   placeholder: string
+  className?: string
+  inputClassName?: string
 }
 
-export default function SearchBar({ placeholder }: SearchBarProps) {
+export default function SearchBar({
+  placeholder,
+  className,
+  inputClassName,
+}: SearchBarProps) {
   const [focused, setFocused] = useState(false)
 
   return (
@@ -17,9 +24,9 @@ export default function SearchBar({ placeholder }: SearchBarProps) {
       className={cn(
         'relative w-full max-w-xl transition-all duration-300',
         focused && 'scale-[1.02]',
+        className,
       )}
     >
-      {/* Aceternity-style glow ring on focus */}
       <div
         className={cn(
           'absolute -inset-0.5 rounded-full bg-gradient-to-r from-campus-primary/20 via-campus-teal/20 to-campus-accent/20 opacity-0 blur-sm transition-opacity duration-300',
@@ -39,7 +46,10 @@ export default function SearchBar({ placeholder }: SearchBarProps) {
           placeholder={placeholder}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          className="w-full pl-12 pr-5 h-11 rounded-full border-campus-primary/10 bg-white/80 backdrop-blur-sm font-label text-base shadow-sm transition-all duration-200 placeholder:text-foreground/40 focus-visible:border-campus-primary/30 focus-visible:ring-campus-primary/10"
+          className={cn(
+            'h-11 w-full rounded-full border-campus-primary/10 bg-white/80 pl-12 pr-5 font-label text-base shadow-sm backdrop-blur-sm transition-all duration-200 placeholder:text-foreground/40 focus-visible:border-campus-primary/30 focus-visible:ring-campus-primary/10',
+            inputClassName,
+          )}
         />
       </div>
     </div>

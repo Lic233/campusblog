@@ -1,4 +1,4 @@
-import type { Config } from 'tailwindcss'
+﻿import type { Config } from 'tailwindcss'
 import animate from 'tailwindcss-animate'
 
 const config: Config = {
@@ -58,16 +58,23 @@ const config: Config = {
           ring: 'var(--sidebar-ring)',
         },
         campus: {
-          primary: '#0D3B66',
-          accent: '#F4A259',
-          teal: '#1D7874',
+          primary: '#1B4B7A',
+          secondary: '#2B7A78',
+          teal: '#2B7A78',
+          accent: '#F0A35E',
           danger: '#D64545',
+          page: '#F4F7FB',
+          panel: '#FFFFFF',
+          'panel-soft': '#EEF4FA',
+          'panel-strong': '#E4EDF8',
+          'border-soft': '#D6E0EC',
+          'text-soft': '#617087',
           surface: '#F7F9FB',
           'surface-dim': '#D8DADC',
-          'surface-container': '#ECEEF0',
+          'surface-container': '#ECF0F4',
           'on-surface': '#191C1E',
-          'on-surface-variant': '#42474F',
-          outline: '#737780',
+          'on-surface-variant': '#4B5566',
+          outline: '#7B8797',
         },
       },
       fontFamily: {
@@ -91,11 +98,11 @@ const config: Config = {
           '0%, 100%': { backgroundPosition: '0% 50%' },
           '50%': { backgroundPosition: '100% 50%' },
         },
-        'float': {
+        float: {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-8px)' },
         },
-        'shimmer': {
+        shimmer: {
           '0%': { backgroundPosition: '-200% 0' },
           '100%': { backgroundPosition: '200% 0' },
         },
@@ -110,8 +117,8 @@ const config: Config = {
       },
       animation: {
         'gradient-x': 'gradient-x 6s ease infinite',
-        'float': 'float 3s ease-in-out infinite',
-        'shimmer': 'shimmer 2s linear infinite',
+        float: 'float 3s ease-in-out infinite',
+        shimmer: 'shimmer 2s linear infinite',
         'spotlight-pulse': 'spotlight-pulse 2s ease-in-out infinite',
         'border-spin': 'border-spin 3s linear infinite',
       },

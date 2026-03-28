@@ -66,7 +66,7 @@ export default function FrontendChrome({
       )}
 
       {isEditorPage ? null : (
-        <div className="fixed top-4 right-4 z-50 flex items-center gap-3">
+        <div className="fixed right-4 top-[var(--floating-toolbar-top)] z-50 flex h-[var(--floating-toolbar-height)] items-center gap-3">
           <LanguageSwitcher
             locale={locale}
             label={t.common.languageLabel}
@@ -79,7 +79,7 @@ export default function FrontendChrome({
               href={githubUrl}
               target="_blank"
               rel="noreferrer noopener"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-campus-primary/10 bg-white/70 text-campus-primary shadow-sm backdrop-blur-md transition-all hover:bg-white/90"
+              className="flex h-[var(--floating-toolbar-height)] w-[var(--floating-toolbar-height)] items-center justify-center rounded-full border border-campus-primary/10 bg-white/70 text-campus-primary shadow-sm backdrop-blur-md transition-all hover:bg-white/90"
               aria-label="GitHub"
               title="GitHub"
             >

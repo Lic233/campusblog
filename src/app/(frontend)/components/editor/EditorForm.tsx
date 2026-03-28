@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useCallback, useState } from 'react'
 import Image from 'next/image'
@@ -19,7 +19,7 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
-import { MovingBorderButton } from '@/components/ui/moving-border'
+import { Button } from '@/components/ui/button'
 import {
   Select,
   SelectContent,
@@ -386,23 +386,25 @@ export default function EditorForm({
 
             <button
               type="button"
+              data-testid="editor-save-draft-button"
               onClick={() => void submitPost('draft')}
               disabled={submitAction !== null || isUploadingCover || isUploadingInlineImage}
-              className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-campus-primary/10 bg-white/75 px-5 text-sm font-label font-semibold text-campus-primary transition-all hover:bg-campus-primary/5 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full border border-campus-primary/10 bg-white/75 px-5 text-sm font-label font-semibold text-campus-primary transition-all hover:bg-campus-primary/5 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <IconCheck size={17} />
               {submitAction === 'draft' ? t.editor.savingDraft : t.editor.saveDraft}
             </button>
 
-            <MovingBorderButton
+            <Button
+              type="button"
+              data-testid="editor-publish-button"
               onClick={() => void submitPost('published')}
               disabled={submitAction !== null || isUploadingCover || isUploadingInlineImage}
-              containerClassName="shrink-0"
-              className="px-8 font-label font-bold text-base"
+              className="h-11 shrink-0 rounded-full bg-campus-primary px-8 font-label text-base font-bold text-white shadow-[0_12px_24px_rgba(13,59,102,0.14)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-campus-primary hover:shadow-[0_16px_32px_rgba(13,59,102,0.18)]"
             >
               <IconPencil size={18} />
               {submitAction === 'publish' ? t.editor.publishing : t.editor.publish}
-            </MovingBorderButton>
+            </Button>
           </div>
         </div>
       </div>
@@ -597,3 +599,8 @@ export default function EditorForm({
     </div>
   )
 }
+
+
+
+
+

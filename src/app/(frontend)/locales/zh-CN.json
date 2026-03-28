@@ -26,6 +26,39 @@
     "noPosts": "暂时还没有可浏览的文章",
     "noPostsHint": "成为第一个分享见解的人吧"
   },
+  "discoverHome": {
+    "heroEyebrow": "校园此刻",
+    "heroTitle": "今天，校园里的人都在聊什么？",
+    "heroSubtitle": "从正在发酵的故事、活动和观点开始，快速进入校园内容现场。",
+    "featuredLabel": "正在被关注",
+    "tabs": {
+      "recommended": "为你推荐",
+      "latest": "最新",
+      "sameSchool": "同校热帖",
+      "nearbySchools": "附近学校"
+    },
+    "views": {
+      "recommendedTitle": "推荐内容",
+      "recommendedHint": "优先浏览当前最值得点开的校园内容。",
+      "latestTitle": "最新发布",
+      "latestHint": "按发布时间排序，第一时间看到新内容。",
+      "sameSchoolTitle": "同校热度",
+      "sameSchoolHint": "围绕当前最活跃学校整理出的更聚焦内容流。",
+      "nearbySchoolsTitle": "附近学校在聊什么",
+      "nearbySchoolsHint": "先横向看看更多校园，再深入进入你感兴趣的话题。"
+    },
+    "sections": {
+      "schoolHighlights": "热门学校",
+      "channelShortcuts": "频道捷径",
+      "trendingTags": "热门标签"
+    },
+    "empty": {
+      "filteredTitle": "这个发现视图里还没有内容",
+      "filteredHint": "试试切换其他发现方式，或者等下一篇内容出现。"
+    },
+    "tabListLabel": "首页发现视图",
+    "backToTop": "回到顶部"
+  },
   "school": {
     "homepage": "主页",
     "allPosts": "全部文章",

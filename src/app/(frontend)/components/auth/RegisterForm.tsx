@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -135,7 +135,7 @@ export default function RegisterForm({
           value={displayName}
           onChange={(event) => setDisplayName(event.target.value)}
           autoComplete="nickname"
-          className="h-10 rounded-xl bg-white/75"
+          className="h-10 rounded-xl border-campus-border-soft bg-campus-panel"
         />
       </div>
 
@@ -147,7 +147,7 @@ export default function RegisterForm({
           onChange={(event) => setEmail(event.target.value)}
           autoComplete="email"
           placeholder="you@example.com"
-          className="h-10 rounded-xl bg-white/75"
+          className="h-10 rounded-xl border-campus-border-soft bg-campus-panel"
         />
       </div>
 
@@ -158,7 +158,7 @@ export default function RegisterForm({
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           autoComplete="new-password"
-          className="h-10 rounded-xl bg-white/75"
+          className="h-10 rounded-xl border-campus-border-soft bg-campus-panel"
         />
       </div>
 
@@ -171,7 +171,7 @@ export default function RegisterForm({
           value={confirmPassword}
           onChange={(event) => setConfirmPassword(event.target.value)}
           autoComplete="new-password"
-          className="h-10 rounded-xl bg-white/75"
+          className="h-10 rounded-xl border-campus-border-soft bg-campus-panel"
         />
       </div>
 
@@ -183,7 +183,7 @@ export default function RegisterForm({
 
       <Button
         type="submit"
-        className="h-11 w-full rounded-xl bg-campus-primary text-white hover:bg-campus-primary/90"
+        className="h-11 w-full rounded-xl bg-gradient-to-r from-campus-primary to-campus-secondary text-white hover:opacity-95"
         disabled={isSubmitting}
       >
         {isSubmitting ? t.auth.registerPending : t.auth.registerButton}

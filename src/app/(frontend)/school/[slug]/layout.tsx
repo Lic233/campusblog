@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import { headers as getHeaders } from 'next/headers.js'
 import { cookies as getCookies } from 'next/headers.js'
 import { notFound } from 'next/navigation'
@@ -49,3 +49,7 @@ export default async function SchoolLayout({
     </div>
   )
 }
+
+
+
+

@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -15,6 +15,9 @@
 
 :root {
   --font-mono: 'Roboto Mono', monospace;
+  --floating-toolbar-top: 1rem;
+  --floating-toolbar-height: 2.25rem;
+  --discover-sticky-top: calc(var(--floating-toolbar-top) + var(--floating-toolbar-height) + 0.75rem);
 }
 
 * {
@@ -86,6 +89,26 @@ svg {
 .masonry-item {
   break-inside: avoid;
   margin-bottom: 1.5rem;
+}
+
+.masonry-grid--discover {
+  column-gap: 0.75rem;
+}
+
+@media (min-width: 1024px) {
+  .masonry-grid--discover {
+    column-count: 3;
+  }
+}
+
+@media (min-width: 1280px) {
+  .masonry-grid--discover {
+    column-count: 4;
+  }
+}
+
+.masonry-grid--discover .masonry-item {
+  margin-bottom: 0.75rem;
 }
 
 /* Hide scrollbar utility */
@@ -358,3 +381,5 @@ svg {
   border-radius: 1.5rem;
   margin: 1.5rem 0;
 }
+
+
