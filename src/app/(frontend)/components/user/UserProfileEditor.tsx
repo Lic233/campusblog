@@ -5,9 +5,9 @@ import { IconCamera, IconLoader2 } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { PrimaryActionButton } from '@/components/ui/primary-action-button'
 import { Textarea } from '@/components/ui/textarea'
 import { uploadMediaFile } from '../../lib/mediaUpload'
 
@@ -213,17 +213,16 @@ export default function UserProfileEditor({
       ) : null}
 
       <div className="flex justify-end">
-        <Button
+        <PrimaryActionButton
           type="submit"
           data-testid="save-profile-button"
-          className="h-11 rounded-full bg-campus-primary px-5 text-white shadow-[0_12px_24px_rgba(13,59,102,0.14)] transition-colors duration-200 hover:bg-campus-secondary"
+          className="px-5"
           disabled={isSubmitting}
         >
           {isSubmitting ? <IconLoader2 size={16} className="animate-spin" /> : null}
           {isSubmitting ? copy.savingProfile : copy.saveProfile}
-        </Button>
+        </PrimaryActionButton>
       </div>
     </form>
   )
 }
-

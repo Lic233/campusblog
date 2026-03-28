@@ -8,8 +8,8 @@ import LogoutButton from '@/components/auth/LogoutButton'
 import UserProfileEditor from '@/components/user/UserProfileEditor'
 import UserPostActions from '@/components/user/UserPostActions'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { PrimaryActionButton } from '@/components/ui/primary-action-button'
 import { sanitizeNextPath } from '@/lib/authNavigation'
 import { getFrontendPayload, getCurrentFrontendUser } from '@/lib/frontendSession'
 import { getPostSchool, getPostSubChannel } from '@/lib/postPresentation'
@@ -197,13 +197,13 @@ export default async function UserCenterPage() {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Button
+            <PrimaryActionButton
               asChild
               data-testid="write-article-button"
-              className="h-11 min-w-[11rem] flex-1 rounded-full bg-campus-primary px-5 text-white shadow-[0_12px_24px_rgba(13,59,102,0.14)] transition-colors duration-200 hover:bg-campus-secondary"
+              className="min-w-[11rem] flex-1"
             >
               <Link href="/editor">{t.userCenter.writeArticle}</Link>
-            </Button>
+            </PrimaryActionButton>
             <LogoutButton
               label={t.common.logout}
               pendingLabel={t.common.logoutPending}
@@ -320,6 +320,5 @@ export default async function UserCenterPage() {
     </section>
   )
 }
-
 
 

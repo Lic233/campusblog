@@ -19,7 +19,7 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
+import { PrimaryActionButton } from '@/components/ui/primary-action-button'
 import {
   Select,
   SelectContent,
@@ -395,16 +395,16 @@ export default function EditorForm({
               {submitAction === 'draft' ? t.editor.savingDraft : t.editor.saveDraft}
             </button>
 
-            <Button
+            <PrimaryActionButton
               type="button"
               data-testid="editor-publish-button"
               onClick={() => void submitPost('published')}
               disabled={submitAction !== null || isUploadingCover || isUploadingInlineImage}
-              className="h-11 shrink-0 rounded-full bg-campus-primary px-8 font-label text-base font-bold text-white shadow-[0_12px_24px_rgba(13,59,102,0.14)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-campus-primary hover:shadow-[0_16px_32px_rgba(13,59,102,0.18)]"
+              className="shrink-0 px-8"
             >
               <IconPencil size={18} />
               {submitAction === 'publish' ? t.editor.publishing : t.editor.publish}
-            </Button>
+            </PrimaryActionButton>
           </div>
         </div>
       </div>
@@ -599,7 +599,6 @@ export default function EditorForm({
     </div>
   )
 }
-
 
 
 

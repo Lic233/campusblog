@@ -36,6 +36,7 @@ describe('UserProfileEditor primary action', () => {
     expect(button.className).toContain('h-11')
     expect(button.className).toContain('rounded-full')
     expect(button.className).toContain('bg-campus-primary')
-    expect(button.className).toContain('hover:bg-campus-secondary')
+    expect(button.className).toContain('hover:bg-campus-primary')
+    expect(button.className).toContain('hover:-translate-y-0.5')
   })
 })
