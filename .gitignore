@@ -6,6 +6,7 @@ pnpm-lock.yaml
 /.pnp
 .pnp.js
 .yarn/install-state.gz
+.pnpm-store/
 
 /.idea/*
 !/.idea/runConfigurations
@@ -15,6 +16,9 @@ pnpm-lock.yaml
 
 # cursor
 .cursor/
+
+# codex
+.codex/
 
 # testing
 /coverage
