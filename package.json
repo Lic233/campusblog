@@ -30,7 +30,7 @@
     "@payloadcms/next": "3.80.0",
     "@payloadcms/storage-r2": "3.80.0",
     "@payloadcms/ui": "3.80.0",
-    "@tabler/icons-react": "^3.41.0",
+    "@tabler/icons-react": "^3.41.1",
     "@tiptap/core": "^3.21.0",
     "@tiptap/extension-placeholder": "^3.21.0",
     "@tiptap/react": "^3.21.0",
