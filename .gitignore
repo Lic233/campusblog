@@ -17,6 +17,7 @@
 .cursor/
 .codex/
 .superpowers/
+docs
 
 # testing
 /coverage
@@ -46,6 +47,11 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env
+
+# tmp
+tmp
+*.docx
 
 # vercel
 .vercel
@@ -53,8 +59,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-.env
 
 /media
 

@@ -1,6 +1,8 @@
 # CampusBlog
 
-> This project is currently in active development (WIP). 
+> This project is currently in active development (WIP).
+>
+> see demo at <https://campusblog.zhuhaoming.workers.dev>
 
 ## Quick Start
 
